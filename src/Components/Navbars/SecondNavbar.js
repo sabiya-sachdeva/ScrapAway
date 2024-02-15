@@ -15,7 +15,7 @@ function SecondNavbar() {
             <a href="/">Contact</a>
           </li>
           <li>
-            <a href="/">Waste/Collect Garbage</a>
+            <a href="/login">Waste/Collect Garbage</a>
           </li>
         </ul>
       </nav>
