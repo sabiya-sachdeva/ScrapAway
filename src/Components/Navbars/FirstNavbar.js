@@ -1,4 +1,4 @@
-import "../App.css";
+import "./Navbar.css";
 
 function FirstNavbar() {
   return (
@@ -11,7 +11,7 @@ function FirstNavbar() {
             </a>
           </li>
           <li>
-            <a href="/">
+            <a href="/sorting">
               <img src="WSG.png" alt="WSG" height="50px" />
             </a>
           </li>
