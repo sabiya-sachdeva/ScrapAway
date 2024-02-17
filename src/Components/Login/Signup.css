@@ -90,11 +90,11 @@
   transform: rotate(45deg);
 }
 
-.checkbox-container a {
+.checkbox-container .link {
   color: #000000;
   text-decoration: none;
 }
 
-.checkbox-container a:hover {
+.checkbox-container .link:hover {
   font-weight: 500;
 }

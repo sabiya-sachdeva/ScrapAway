@@ -1,61 +1,46 @@
-import React, { useState } from "react";
-import Login from "./Login";
-import Signup from "./Signup";
+import React from "react";
+import { Link } from "react-router-dom";
 import "./CTA.css";
 
 function CTA() {
-  const [activeComponent, setActiveComponent] = useState("default");
-
-  const showLoginForm = () => {
-    setActiveComponent("login");
-  };
-
-  const showSignupForm = () => {
-    setActiveComponent("signup");
-  };
-
-  const renderComponent = () => {
-    if (activeComponent === "login") {
-      return <Login />;
-    } else if (activeComponent === "signup") {
-      return <Signup />;
-    } else {
-      return (
-        <>
-          <a href="/">
-            <img src="SAlogodark.png" alt="Logo" width="90%" />
-          </a>
-          <button
-            type="button"
-            className="cta-signup-btn"
-            onClick={showSignupForm}
-          >
-            Sign up
-          </button>
-          <div className="cta-login-container">
-            <button
-              type="button"
-              className="cta-login-btn"
-              onClick={showLoginForm}
-            >
-              Log in
-            </button>
-          </div>
-          <p className="terms-text">
-            By signing up you agree to our <a href="/">Terms of Use</a> and{" "}
-            <a href="/">Privacy Policy</a>.
-          </p>
-        </>
-      );
-    }
-  };
-
   return (
     <div className="cta-login-body">
       <div className="cta-form-container">
-        <form className="cta-task-form" onSubmit={(e) => e.preventDefault()}>
-          {renderComponent()}
-        </form>
+        <div className="cta-task-form" onSubmit={(e) => e.preventDefault()}>
+          <>
+            <Link to="/">
+              <img
+                src="SAlogodark.png"
+                alt="Logo"
+                width="100%"
+                className="ToHomepage"
+              />
+            </Link>
+            <div className="cta-login-container">
+              <Link to="/register" className="cta-signup-btn">
+                Sign up
+              </Link>
+            </div>
+            <div className="cta-login-container">
+              <Link to="/login" className="cta-login-btn">
+                Log in
+              </Link>
+            </div>
+            <p className="terms-text">
+              By signing up you agree to our{" "}
+              <Link className="link" to="/">
+                {" "}
+                Terms of Use
+              </Link>{" "}
+              and{" "}
+              <Link className="link" to="/">
+                {" "}
+                Privacy Policy
+              </Link>
+              .
+            </p>
+          </>
+        </div>
       </div>
     </div>
   );

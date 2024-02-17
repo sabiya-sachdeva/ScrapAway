@@ -13,8 +13,8 @@
   overflow: hidden;
 }
 
-form img {
-  margin-bottom: 20px;
+.ToHomepage {
+  margin-bottom: 10px;
 }
 
 .cta-form-container {
@@ -34,6 +34,8 @@ form img {
   margin-bottom: 10px;
   cursor: pointer;
   font-weight: 500;
+  text-decoration: none;
+  text-align: center;
 }
 
 .cta-signup-btn {
@@ -43,6 +45,7 @@ form img {
 .cta-login-btn {
   background-color: #ffffff;
   border: 2px solid #000000;
+  color: #000000;
 }
 
 .cta-signup-btn:hover {
@@ -64,11 +67,11 @@ form img {
   margin: auto;
 }
 
-.terms-text a {
+.terms-text .link {
   color: #000000;
   text-decoration: none;
 }
 
-.terms-text a:hover {
+.terms-text .link:hover {
   font-weight: 500;
 }

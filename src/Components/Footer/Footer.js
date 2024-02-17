@@ -3,8 +3,8 @@ function Footer() {
   return (
     <>
       <hr className="divider-line" />
-      <footer class="footer">
-        <div class="footer-content">
+      <footer className="footer">
+        <div className="footer-content">
           <img src="SAlogodark.png" alt="Logo" width="60%"></img>
           <p>
             Simplifying waste disposal with convenient door-to-door <br />
@@ -33,7 +33,7 @@ function Footer() {
             className="socials"
           ></img>
         </div>
-        <div class="footer-content">
+        <div className="footer-content">
           <div className="footflex">
             <div className="links">
               <h3>Quick links</h3>
