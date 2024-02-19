@@ -75,9 +75,11 @@ function Login() {
                   </Link>
                 </p>
               </div>
-              <button type="submit" className="login-btn">
-                Login
-              </button>
+              <div className="cta-login-container">
+                <Link to="/dashboard" className="login-btn">
+                  Login
+                </Link>
+              </div>
               <p className="terms-text">
                 New to ScrapAway?{" "}
                 <Link to="/register" className="link">

@@ -5,6 +5,8 @@ import Home from "./Components/Home";
 import CTA from "./Components/Login/CTA";
 import Signup from "./Components/Login/Signup";
 import Login from "./Components/Login/Login";
+import Dashboard from "./Components/Dashboard/Dashboard";
+
 import "./App.css";
 
 function App() {
@@ -16,6 +18,7 @@ function App() {
         <Route path="/cta" element={<CTA />} />
         <Route path="/register" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </>
   );
