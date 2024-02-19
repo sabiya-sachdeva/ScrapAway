@@ -1,21 +1,22 @@
+import { Link } from "react-router-dom";
 import "./Navbar.css";
 
-function SecondNavbar() {
+function SecondNavbar(props) {
   return (
     <div>
       <nav className="nav2">
         <ul>
           <li>
-            <a href="/">Blog</a>
+            <Link to="/blog">Blog</Link>
           </li>
           <li>
-            <a href="/">About</a>
+            <Link to="/about">About</Link>
           </li>
           <li>
-            <a href="/">Contact</a>
+            <Link to="/contact">Contact</Link>
           </li>
           <li>
-            <a href="/cta">Waste/Collect Garbage</a>
+            <Link to="/cta">{props.username}</Link>
           </li>
         </ul>
       </nav>
