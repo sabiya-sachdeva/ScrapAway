@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./Navbar.css";
 import { Link } from "react-router-dom";
 
-function SecondNavbardropdown(props) {
+function SecondNavBar(props) {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   // Show the dropdown menu
@@ -32,7 +32,7 @@ function SecondNavbardropdown(props) {
           onMouseEnter={showDropdown}
           onMouseLeave={hideDropdown}
         >
-          <Link className="dropbtn">{props.username}</Link>
+          <Link className="dropbtn">{props.username}</Link> {/* Display fullName */}
           {isDropdownVisible && (
             <div className="dropdown-content">
               <Link to="/profile">Profile</Link>
@@ -46,4 +46,4 @@ function SecondNavbardropdown(props) {
   );
 }
 
-export default SecondNavbardropdown;
+export default SecondNavBar;

@@ -14,6 +14,9 @@ function Signup() {
   };
 
   const [user, setUser] = useState(initialUserState);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
   let name, value;
   const handleinput = (e) => {
@@ -29,15 +32,44 @@ function Signup() {
     e.preventDefault();
 
     axios
-      .post("http://localhost:3005/register", user)
+      .post("http://127.0.0.1:3005/register", user)
       .then((res) => {
         console.log(res);
         setUser(initialUserState);
+
         // Redirect to homepage
+        window.location.href = "/login";
       })
       .catch((err) => {
         console.log(err);
       });
+  };
+  const validateEmail = () => {
+    if (!user.email.includes("@")) {
+      setEmailError("Invalid email format");
+    } else {
+      setEmailError("");
+    }
+  };
+
+  const validatePassword = () => {
+    if (user.password.length < 8) {
+      setPasswordError(
+        "Password must contain at least 8 characters, including one uppercase letter, one lowercase letter, one number, and one special character"
+      );
+    } else {
+      setPasswordError("");
+    }
+  };
+
+  const validatePasswordConfirmation = () => {
+    if (user.password !== user.cpassword) {
+      setPasswordError("Passwords do not match");
+      setConfirmPasswordError("Passwords do not match");
+    } else {
+      setPasswordError("");
+      setConfirmPasswordError("");
+    }
   };
 
   return (
@@ -93,7 +125,11 @@ function Signup() {
                           onChange={handleinput}
                           autoComplete="off"
                           placeholder="Email"
+                          onBlur={validateEmail}
                         />
+                         {emailError && (
+                          <p className="error-message">{emailError}</p>
+                        )}
                       </div>
                       <div className="form-group">
                         <label htmlFor="password"></label>
@@ -105,7 +141,11 @@ function Signup() {
                           onChange={handleinput}
                           autoComplete="off"
                           placeholder="Password"
+                          onBlur={validatePassword}
                         />
+                         {passwordError && (
+                          <p className="error-message">{passwordError}</p>
+                        )}
                       </div>
                       <div className="form-group">
                         <label htmlFor="cpassword"></label>
@@ -117,7 +157,13 @@ function Signup() {
                           onChange={handleinput}
                           autoComplete="off"
                           placeholder="Confirm password"
+                          onBlur={validatePasswordConfirmation}
                         />
+                         {confirmPasswordError && (
+                          <p className="error-message">
+                            {confirmPasswordError}
+                          </p>
+                        )}
                       </div>
                       <br />
                       <div className="terms-container">
