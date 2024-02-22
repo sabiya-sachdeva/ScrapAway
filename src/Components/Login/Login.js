@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import axios from "axios";
+import { Link } from "react-router-dom"; // Import Link for navigation
+import SecondNavbarDropdown from "../Navbars/SecondNavbardropdown"; // Import the SecondNavbarDropdown component
 
 import "./Login.css";
 
@@ -17,20 +18,27 @@ function Login() {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await axios.post(
-        "http://localhost:3005/login",
+        "http://127.0.0.1:3005/login",
         credentials
       );
-      console.log(response.data); // Handle response data as needed
-      // Redirect user after successful login, display message, etc.
+  
+      console.log(response.data);
+      const { fname, lname } = response.data;
+      const fullName = `${fname} ${lname}`;
+      console.log(fullName);
+  
+      // Redirecting to Dashboard component with fullName as a query parameter
+      const queryString = `fullName=${encodeURIComponent(fullName)}`;
+      window.location.href = `/dashboard?${queryString}`;
     } catch (error) {
       console.error("Login error:", error);
       // Handle login error, display error message, etc.
     }
   };
-
+  
   return (
     <div className="cta-login-body">
       <div className="cta-form-container">
@@ -76,9 +84,9 @@ function Login() {
                 </p>
               </div>
               <div className="cta-login-container">
-                <Link to="/dashboard" className="login-btn">
+                <button type="submit" className="login-btn">
                   Login
-                </Link>
+                </button>
               </div>
               <p className="terms-text">
                 New to ScrapAway?{" "}
@@ -90,6 +98,7 @@ function Login() {
           </div>
         </form>
       </div>
+      {/* <SecondNavbarDropdown username={fullName} /> */}
     </div>
   );
 }
