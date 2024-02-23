@@ -22,6 +22,12 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  usertype:
+  {
+    type: String,
+    enum: ['User', 'Collector'],
+    required: true,
+  }
 });
 
 const User = mongoose.model("USER", userSchema);
