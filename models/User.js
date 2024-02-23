@@ -15,11 +15,11 @@ const userSchema = new Schema({
     unique: true,
   },
   password: {
-    type: Number,
+    type: String,
     required: true,
   },
   cpassword: {
-    type: Number,
+    type: String,
     required: true,
   },
 });
