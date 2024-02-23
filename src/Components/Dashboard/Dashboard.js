@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import SecondNavbardropdown from "../Navbars/SecondNavbardropdown";
 import FirstNavbar from "../Navbars/FirstNavbar";
-import Footer from "../Footer/Footer";
-import Seller from "../Seller/Seller";
-
+import TrashDetailsForm from "./TrashDetailsForm";
 
 function Dashboard() {
   const [fullName, setFullName] = useState(null);
@@ -23,8 +21,7 @@ function Dashboard() {
     <>
       <FirstNavbar />
       <SecondNavbardropdown username={fullName} />
-      <Seller />
-      <Footer />
+      <TrashDetailsForm />
     </>
   );
 }

@@ -32,14 +32,22 @@ function SecondNavBar(props) {
           onMouseEnter={showDropdown}
           onMouseLeave={hideDropdown}
         >
-          <Link className="dropbtn">{" Hello, "}{props.username}
-          <img src="dropdown.png" alt="" style={{ width:"15px" ,marginLeft:"6px",background:"white"}} />
-          </Link> {/* Display fullName */}
+          <Link className="dropbtn">
+            {" Hello, "}
+            {props.username}
+            <img
+              src="dropdown.png"
+              alt=""
+              style={{ width: "15px", marginLeft: "6px", background: "white" }}
+            />
+          </Link>{" "}
+          {/* Display fullName */}
           {isDropdownVisible && (
             <div className="dropdown-content">
               <Link to="/profile">Profile</Link>
               <Link to="/history">History</Link>
               <Link to="/track-order">Track Order</Link>
+              <Link to="/log-out">Logout</Link>
             </div>
           )}
         </li>
