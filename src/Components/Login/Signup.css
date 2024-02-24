@@ -98,3 +98,23 @@
 .checkbox-container .link:hover {
   font-weight: 500;
 }
+.radiobox-container label {
+  /* Adjust the margin between checkboxes and labels */
+  margin-top: -5px; /* Add margin to the left to shift the labels */
+}
+.radiobox-container {
+  display: flex;
+}
+.radiobox-container input {
+  width: 15%;
+}
+
+/* .password-toggle-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  width: 20px; 
+  height: 20px; 
+} */

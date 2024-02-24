@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom"; // Import Link for navigation
+import { Link, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 import "./Login.css";
 
@@ -10,6 +11,8 @@ function Login() {
     password: "",
   });
 
+  const navigate = useNavigate(); // Hook for programmatic navigation
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setCredentials({ ...credentials, [name]: value });
@@ -17,27 +20,24 @@ function Login() {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:3005/login",
-        credentials
-      );
-  
-      console.log(response.data);
-      const { fname, lname } = response.data;
-      const fullName = `${fname} ${lname}`;
-      console.log(fullName);
-  
-      // Redirecting to Dashboard component with fullName as a query parameter
-      const queryString = `fullName=${encodeURIComponent(fullName)}`;
-      window.location.href = `/dashboard?${queryString}`;
+      const API_URL = "http://127.0.0.1:3005/login";
+      const response = await axios.post(API_URL, credentials);
+
+      const { token } = response.data;
+      localStorage.setItem("token", token);
+
+      // After storing the token
+      const decodedToken = jwtDecode(token);
+      console.log(decodedToken);
+
+      navigate("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
-      // Handle login error, display error message, etc.
     }
   };
-  
+
   return (
     <div className="cta-login-body">
       <div className="cta-form-container">
@@ -70,6 +70,7 @@ function Login() {
                   name="password"
                   value={credentials.password}
                   onChange={handleInputChange}
+                  autoComplete="off"
                 />
                 <p className="terms-text">
                   Forgot your{" "}

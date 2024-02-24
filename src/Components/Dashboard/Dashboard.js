@@ -1,26 +1,45 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import SecondNavbardropdown from "../Navbars/SecondNavbardropdown";
 import FirstNavbar from "../Navbars/FirstNavbar";
 import TrashDetailsForm from "./TrashDetailsForm";
 
+async function fetchUserDetails() {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await fetch("http://127.0.0.1:3005/userdetails", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error(
+        `Network response was not ok, status: ${response.status}`
+      );
+    }
+    if (!response.headers.get("content-type")?.includes("application/json")) {
+      throw new Error("Received non-JSON response");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+  }
+}
+
 function Dashboard() {
-  const [fullName, setFullName] = useState(null);
-  const location = useLocation();
+  const [firstName, setFirstName] = useState("");
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const fullNameFromQuery = params.get("fullName");
-    if (fullNameFromQuery) {
-      console.log("Full Name:", fullNameFromQuery);
-      setFullName(fullNameFromQuery);
-    }
-  }, [location.search]);
-
+    fetchUserDetails().then((data) => {
+      if (data && data.firstName) {
+        setFirstName(data.firstName);
+      }
+    });
+  }, []); // Run once on component mount
   return (
     <>
       <FirstNavbar />
-      <SecondNavbardropdown username={fullName} />
+      <SecondNavbardropdown username={firstName} />
       <TrashDetailsForm />
     </>
   );
