@@ -1,64 +1,54 @@
-require("dotenv").config();
-const express = require("express");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-require("../Db/Db");
-const JWT_SECRET = process.env.JWT_SECRET;
-
 const router = express.Router();
 
-// Middleware to verify the token
-const verifyToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    const token = authHeader.split(" ")[1];
+const User = require("../models/User");
+const Waste = require("../models/Waste.js");
 
-    jwt.verify(token, JWT_SECRET, (err, decoded) => {
-      if (err) {
-        return res.status(403).json({ error: "Token is invalid or expired" });
-      }
-      req.user = decoded; // Add decoded token payload to request object
-      next();
-    });
-  } else {
-    res.status(401).json({ error: "A token is required for authentication" });
-  }
-};
-
-// Register User
 router.post("/register", async (req, res) => {
-  const { fname, lname, email, password } = req.body;
+  const { fname, lname, email, password, cpassword, usertype } = req.body; // destructing
 
-  if (!fname || !lname || !email || !password) {
-    return res.status(400).json({ error: "Please fill all required fields" });
+  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
+  if (!fname || !lname || !email || !password || !cpassword || !usertype) {
+    return res.status(422).json({ error: "plz fill these filed" });
+  }
+  if (!email.includes("@")) {
+    return res.status(422).json({ error: "Invalid email format" });
+  }
+
+  if (!passwordRegex.test(password)) {
+    return res.status(422).json({
+      error:
+        "Password must contain at least 8 characters, including one uppercase letter, one lowercase letter, one number, and one special character",
+    });
+  }
+
+  if (password !== cpassword) {
+    return res.status(422).json({ error: "Passwords do not match" });
   }
 
   try {
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(409).json({ error: "Email already exists" });
-    }
+    const userexists = await User.findOne({ email: email }); // User is get from const User = require("../models/User");
 
-    // Hash the password before saving it to the database
-    const hashedPassword = await bcrypt.hash(password, 10);
+    if (userexists) {
+      return res.status(422).json({ error: "email alredy exits" });
+    }
 
     const user = new User({
       fname,
       lname,
       email,
-      password: hashedPassword,
-    });
+      password,
+      cpassword,
+      usertype,
+    }); //if key value same then no need to mention key :value
 
     await user.save();
-    res.status(201).json({ message: "User registered successfully" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+
+    res.status(201).json({ message: "data saved" });
+  } catch (err) {
+    console.log(err);
   }
 });
 
-// Login User
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -68,29 +58,22 @@ router.post("/login", async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
+
     if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    // const isMatch = await bcrypt.compare(password, user.password);
-    // if (!isMatch) {
-    //   return res.status(401).json({ error: "Invalid credentials" });
-    // }
-
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
-      expiresIn: "12h",
-    });
-
-    res.status(200).json({ token });
-  } catch (error) {
-    console.error(error);
+    // Return the complete user object
+    res.status(200).json(user);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
 router.post("/submit", async (req, res) => {
   const { name, contactno, address, pincode, email, pickupdate, typeofwaste } =
-    req.body;
+    req.body; // destructing
 
   try {
     const waste = new Waste({
@@ -112,6 +95,7 @@ router.post("/submit", async (req, res) => {
 });
 
 //update password
+
 router.post("/forgotpass", async (req, res) => {
   const { email, password, cpassword } = req.body;
 
@@ -162,22 +146,30 @@ router.get("/register/:email", async (req, res) => {
   }
 });
 
-//Get user details after login
-router.get("/userdetails", verifyToken, async (req, res) => {
-  // Using verifyToken middleware for authentication
+// Endpoint to get user profile information by email
+router.get("/user/profile/:email", async (req, res) => {
+  const userEmail = req.params.email;
+
   try {
-    const user = await User.findById(req.user.userId).select("-password"); // Assuming `req.user.userId` is set by verifyToken middleware
+    // Find the user by email in the database
+    const user = await User.findOne({ email: userEmail }).select(
+      "fname lname email"
+    );
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    res.json({
-      firstName: user.fname,
-      lastName: user.lname,
+
+    // Return only the user's full name and email
+    const userProfile = {
+      fullName: user.fname + " " + user.lname,
       email: user.email,
-    }); // Ensure these field names match your User model
+    };
+
+    res.status(200).json(userProfile);
   } catch (error) {
-    console.error("Error fetching user details:", error);
-    res.status(500).json({ error: "Failed to fetch user details" });
+    console.error("Error fetching user profile data:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
