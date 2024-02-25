@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import "./Navbar.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function SecondNavBar(props) {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const navigate = useNavigate();
 
   // Show the dropdown menu
   const showDropdown = () => {
@@ -13,6 +14,14 @@ function SecondNavBar(props) {
   // Hide the dropdown menu
   const hideDropdown = () => {
     setIsDropdownVisible(false);
+  };
+
+  const handleLogout = () => {
+    // Remove the token from localStorage or sessionStorage
+    localStorage.removeItem("token"); // Assuming the token is stored in localStorage
+    // Update any application state here if necessary
+    // Redirect the user
+    navigate("/login"); // Redirect to login page or home page as per your routing setup
   };
 
   return (
@@ -47,7 +56,9 @@ function SecondNavBar(props) {
               <Link to="/profile">Profile</Link>
               <Link to="/history">History</Link>
               <Link to="/track-order">Track Order</Link>
-              <Link to="/log-out">Logout</Link>
+              <a onClick={handleLogout} href="/login">
+                Logout
+              </a>
             </div>
           )}
         </li>

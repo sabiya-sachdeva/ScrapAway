@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios"; // Assuming axios is used for API requests
+import axios from "axios";
 import "./Profile.css";
 import FirstNavbar from "../Navbars/FirstNavbar";
 import SecondNavbardropdown from "../Navbars/SecondNavbardropdown";
 import Footer from "../Footer/Footer";
 
+//$2b$10$AzCDSOgZNLgXbGlmJ/e2m.XUtYBym/Q6Ol8Qvc0EtrkZXPfGnnDb2
+
 function Profile() {
+  const [tempProfile, setTempProfile] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
   const [profile, setProfile] = useState({
     firstName: "",
     lastName: "",
@@ -34,13 +45,8 @@ function Profile() {
         });
 
         const { firstName, lastName, email } = response.data;
-        console.log(response.data);
-        setProfile((prevProfile) => ({
-          ...prevProfile,
-          firstName,
-          lastName,
-          email,
-        }));
+        setProfile({ firstName, lastName, email });
+        setTempProfile({ firstName, lastName, email });
       } catch (error) {
         console.error("Error fetching profile data:", error);
         setFeedback({
@@ -55,26 +61,80 @@ function Profile() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProfile((prevProfile) => ({ ...prevProfile, [name]: value }));
+    setTempProfile((prevProfile) => ({ ...prevProfile, [name]: value }));
   };
 
-  const handleProfileSubmit = async (e) => {
+  const handleProfileUpdate = async (e) => {
     e.preventDefault();
-    console.log("Profile update logic here...");
-    setFeedback({ message: "Profile updated successfully!", isError: false });
-  };
-
-  const handlePasswordChangeSubmit = async (e) => {
-    e.preventDefault();
-    if (profile.newPassword !== profile.confirmPassword) {
-      setFeedback({ message: "Passwords do not match.", isError: true });
+    const userToken = localStorage.getItem("token");
+    if (!userToken) {
+      console.error("No user token found in local storage.");
+      setFeedback({ message: "User not authenticated.", isError: true });
       return;
     }
-    // Placeholder for password change logic
-    // Implement the API call to change the password here
-    console.log("Password change logic here...");
-    // Update feedback state based on the operation result
-    setFeedback({ message: "Password changed successfully!", isError: false });
+
+    try {
+      const response = await axios.put(
+        "http://127.0.0.1:3005/updateProfile",
+        tempProfile,
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
+      console.log(response.data); // Assuming the server returns updated profile data
+
+      // Check if the update was successful (status code 200)
+      if (response.status === 200) {
+        // Update profile state with the updated data
+        setProfile(tempProfile);
+
+        // Update feedback state
+        setFeedback({
+          message: "Profile updated successfully!",
+          isError: false,
+        });
+      } else {
+        setFeedback({ message: "Failed to update profile.", isError: true });
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      setFeedback({ message: "Failed to update profile.", isError: true });
+    }
+  };
+
+  const handlePasswordUpdate = async () => {
+    const userToken = localStorage.getItem("token");
+    if (!userToken) {
+      console.error("No user token found in local storage.");
+      setFeedback({ message: "User not authenticated.", isError: true });
+      return;
+    }
+
+    try {
+      const response = await axios.put(
+        "http://127.0.0.1:3005/updatePassword",
+        {
+          currentPassword: profile.currentPassword,
+          newPassword: profile.newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
+      console.log(response.data); // Assuming the server returns a success message
+      // Update feedback state
+      setFeedback({
+        message: "Password updated successfully!",
+        isError: false,
+      });
+    } catch (error) {
+      console.error("Error updating password:", error);
+      setFeedback({ message: "Failed to update password.", isError: true });
+    }
   };
 
   return (
@@ -82,15 +142,6 @@ function Profile() {
       <FirstNavbar />
       <SecondNavbardropdown username={`${profile.firstName}`} />
       <div className="profile-container">
-        {feedback.message && (
-          <div
-            className={`feedback-message ${
-              feedback.isError ? "error" : "success"
-            }`}
-          >
-            {feedback.message}
-          </div>
-        )}
         <div className="profile-card">
           <div className="profile-pic-section">
             <div className="profile-pic"></div>
@@ -99,14 +150,16 @@ function Profile() {
           </div>
         </div>
         <div className="profile-form">
-          <form onSubmit={handleProfileSubmit} className="edit-profile">
+          <form onSubmit={handleProfileUpdate} className="edit-profile">
+            <p className="update-label">Update Profile Details</p>
+            <hr className="divider-line" />
             <div className="form-section">
               <label htmlFor="firstName">First Name</label>
               <input
                 id="firstName"
                 name="firstName"
                 type="text"
-                value={profile.firstName}
+                value={tempProfile.firstName}
                 onChange={handleChange}
               />
             </div>
@@ -116,7 +169,7 @@ function Profile() {
                 id="lastName"
                 name="lastName"
                 type="text"
-                value={profile.lastName}
+                value={tempProfile.lastName}
                 onChange={handleChange}
               />
             </div>
@@ -126,7 +179,7 @@ function Profile() {
                 id="email"
                 name="email"
                 type="email"
-                value={profile.email}
+                value={tempProfile.email}
                 onChange={handleChange}
               />
             </div>
@@ -135,18 +188,27 @@ function Profile() {
                 Save Changes
               </button>
             </div>
+            {feedback.message && (
+              <div
+                className={`feedback-message ${
+                  feedback.isError ? "error" : "success"
+                }`}
+              >
+                {feedback.message}
+              </div>
+            )}
           </form>
-          <form
-            onSubmit={handlePasswordChangeSubmit}
-            className="change-password"
-          >
+          <form onSubmit={handlePasswordUpdate} className="change-password">
+            <p className="update-label">Change Password</p>
+            <hr className="divider-line" />
             <div className="form-section">
               <label htmlFor="currentPassword">Current Password</label>
               <input
                 id="currentPassword"
                 name="currentPassword"
                 type="password"
-                value={profile.currentPassword}
+                autoComplete="off"
+                value={tempProfile.currentPassword}
                 onChange={handleChange}
               />
             </div>
@@ -156,7 +218,8 @@ function Profile() {
                 id="newPassword"
                 name="newPassword"
                 type="password"
-                value={profile.newPassword}
+                autoComplete="off"
+                value={tempProfile.newPassword}
                 onChange={handleChange}
               />
             </div>
@@ -166,7 +229,8 @@ function Profile() {
                 id="confirmPassword"
                 name="confirmPassword"
                 type="password"
-                value={profile.confirmPassword}
+                autoComplete="off"
+                value={tempProfile.confirmPassword}
                 onChange={handleChange}
               />
             </div>
@@ -175,6 +239,15 @@ function Profile() {
                 Save Changes
               </button>
             </div>
+            {feedback.message && (
+              <div
+                className={`feedback-message ${
+                  feedback.isError ? "error" : "success"
+                }`}
+              >
+                {feedback.message}
+              </div>
+            )}
           </form>
         </div>
       </div>

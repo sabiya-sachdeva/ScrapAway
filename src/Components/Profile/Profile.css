@@ -1,6 +1,6 @@
 .profile-container {
   display: flex;
-  padding: 30px;
+  padding: 20px 100px;
   gap: 30px;
   background-color: #f4f4f4;
   font-family: "Poppins", sans-serif;
@@ -10,7 +10,7 @@
   flex: 1;
   padding: 20px;
   background: #fff;
-  border-radius: 10px;
+  border-radius: 20px;
 }
 
 .profile-form {
@@ -34,13 +34,14 @@
 .change-password {
   background: #fff;
   padding: 20px;
-  border-radius: 10px;
+  border-radius: 20px;
 }
 
 .form-section {
   display: flex;
   align-items: center;
   margin: 10px;
+  padding-top: 10px;
 }
 
 .form-section label {
@@ -52,7 +53,7 @@
   flex: 1;
   padding: 10px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 5px;
 }
 
 .button-container {
@@ -100,4 +101,30 @@
   .form-section input {
     width: 100%; /* full width on small screens */
   }
+}
+
+.username {
+  font-weight: bold;
+  font-size: larger;
+}
+
+.divider-line {
+  border: 1px solid rgb(164, 164, 164);
+  width: 98%;
+  margin: 10px auto;
+}
+
+.update-label {
+  padding: 0px 10px;
+  font-weight: 600;
+  font-size: large;
+  text-align: left;
+  margin: 0px auto;
+}
+
+.feedback-message {
+  font-size: small;
+  color: red;
+  text-align: right;
+  padding: 0px 10px;
 }
