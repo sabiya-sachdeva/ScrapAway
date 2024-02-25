@@ -152,7 +152,7 @@ function Profile() {
         <div className="profile-form">
           <form onSubmit={handleProfileUpdate} className="edit-profile">
             <p className="update-label">Update Profile Details</p>
-            <hr className="divider-line" />
+            <hr className="horizontal-line" />
             <div className="form-section">
               <label htmlFor="firstName">First Name</label>
               <input
@@ -200,7 +200,7 @@ function Profile() {
           </form>
           <form onSubmit={handlePasswordUpdate} className="change-password">
             <p className="update-label">Change Password</p>
-            <hr className="divider-line" />
+            <hr className="horizontal-line" />
             <div className="form-section">
               <label htmlFor="currentPassword">Current Password</label>
               <input

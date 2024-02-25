@@ -79,10 +79,10 @@ const TrashDetailsForm = () => {
           <div>
             <form id="msform" onSubmit={handleSubmit}>
               <ul id="progressbar">
-                <li className={step === 1 ? "active" : ""}>Personal Details</li>
-                <li className={step === 2 ? "active" : ""}>Personal Details</li>
-                <li className={step === 3 ? "active" : ""}>Personal Details</li>
-                <li className={step === 4 ? "active" : ""}>Submit</li>
+                <li className={step === 1 ? "active" : ""}></li>
+                <li className={step === 2 ? "active" : ""}></li>
+                <li className={step === 3 ? "active" : ""}></li>
+                <li className={step === 4 ? "active" : ""}></li>
               </ul>
               <fieldset style={{ display: step === 1 ? "block" : "none" }}>
                 <h2 className="fs-title">

@@ -7,6 +7,7 @@ import Signup from "./Components/Login/Signup";
 import Login from "./Components/Login/Login";
 import Dashboard from "./Components/Dashboard/Dashboard";
 import Profile from "./Components/Profile/Profile";
+import TrackOrder from "./Components/TrackOrder/TrackOrder";
 
 import "./App.css";
 
@@ -21,6 +22,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/track-order" element={<TrackOrder />} />
       </Routes>
     </>
   );
