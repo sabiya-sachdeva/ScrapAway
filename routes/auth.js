@@ -111,7 +111,7 @@ router.post("/submit", async (req, res) => {
   }
 });
 
-//update password
+//forget password
 router.post("/forgotpass", async (req, res) => {
   const { email, password, cpassword } = req.body;
 
@@ -140,28 +140,6 @@ router.post("/forgotpass", async (req, res) => {
   }
 });
 
-// Route to update waste details
-
-// routes to fetch username from given email
-router.get("/register/:email", async (req, res) => {
-  const userEmail = req.params.email;
-
-  try {
-    // Find the user by email in the database
-    const user = await User.findOne({ email: userEmail });
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    // Return user data
-    res.status(200).json(user);
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
 //Get user details after login
 router.get("/userdetails", verifyToken, async (req, res) => {
   // Using verifyToken middleware for authentication
@@ -178,6 +156,72 @@ router.get("/userdetails", verifyToken, async (req, res) => {
   } catch (error) {
     console.error("Error fetching user details:", error);
     res.status(500).json({ error: "Failed to fetch user details" });
+  }
+});
+
+// Update User Profile (firstName, lastName, email)
+
+router.put("/updateProfile", verifyToken, async (req, res) => {
+  try {
+    // Extract updated profile details from the request body
+    const { firstName, lastName, email } = req.body;
+
+    // Find the user by ID
+    const userId = req.user.userId;
+    const user = await User.findById(userId);
+
+    // If user not found, return 404 error
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Update user profile details
+    user.fname = firstName;
+    user.lname = lastName;
+    user.email = email;
+
+    // Save the updated user
+    await user.save();
+
+    // Return success response
+    res.status(200).json({ message: "Profile updated successfully", user });
+  } catch (error) {
+    // Handle errors
+    console.error("Error updating profile:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Change password
+router.put("/updatePassword", verifyToken, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.userId;
+    console.log(currentPassword);
+
+    // Fetch user from the database
+    const user = await User.findById(userId); // Check if the current password provided by the user matches the one in the database
+    const isPasswordMatch = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+
+    if (!isPasswordMatch) {
+      return res.status(400).json({ error: "Current password is incorrect" });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password
+    user.password = hashedPassword;
+    await user.save();
+
+    // Return success response
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error updating password:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
