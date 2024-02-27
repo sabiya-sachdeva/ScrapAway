@@ -13,18 +13,16 @@ import "./App.css";
 
 function App() {
   return (
-    <>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/sorting" element={<WasteSorting />} />
-        <Route path="/cta" element={<CTA />} />
-        <Route path="/register" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/track-order" element={<TrackOrder />} />
-      </Routes>
-    </>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/sorting" element={<WasteSorting />} />
+      <Route path="/cta" element={<CTA />} />
+      <Route path="/register" element={<Signup />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/track-order" element={<TrackOrder />} />
+    </Routes>
   );
 }
 

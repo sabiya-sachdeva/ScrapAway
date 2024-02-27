@@ -11,64 +11,73 @@ function Signup() {
     email: "",
     password: "",
     confirmPassword: "",
+    agreedToPrivacy: false,
   };
 
   const [user, setUser] = useState(initialUserState);
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [errors, setErrors] = useState({});
 
-  const handleInputChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
-  };
+  const validate = () => {
+    const errors = {};
 
-  const validateEmail = () => {
-    if (!user.email.includes("@")) {
-      setEmailError("Invalid email format");
-    } else {
-      setEmailError("");
+    if (!user.fname.trim()) {
+      errors.fname = "**First name is required";
     }
-  };
-
-  const validatePassword = () => {
-    if (user.password.length < 8) {
-      setPasswordError(
-        "Password must contain at least 8 characters, including one uppercase letter, one lowercase letter, one number, and one special character"
-      );
-    } else {
-      setPasswordError("");
+    if (!user.lname.trim()) {
+      errors.lname = "**Last name is required";
     }
-  };
-
-  const validatePasswordConfirmation = () => {
-    if (user.password !== user.confirmPassword) {
-      setConfirmPasswordError("Passwords do not match");
-    } else {
-      setConfirmPasswordError("");
+    if (!user.email.trim()) {
+      errors.email = "**Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(user.email)) {
+      errors.email = "**Email address is invalid";
     }
+    if (!user.password.trim()) {
+      errors.password = "**Password is required";
+    } else if (user.password.length < 8) {
+      errors.password = "**Password must be at least 8 characters long";
+    }
+    if (!user.confirmPassword.trim()) {
+      errors.confirmPassword = "**Confirm password is required";
+    } else if (user.confirmPassword !== user.password) {
+      errors.confirmPassword = "**Passwords do not match";
+    }
+    if (!user.agreedToPrivacy) {
+      errors.agreedToPrivacy = "**Please agree to the privacy policy";
+    }
+
+    return errors;
   };
 
-  const postdata = async (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUser({ ...user, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const validationErrors = validate();
+    setErrors(validationErrors);
 
-    axios
-      .post("http://127.0.0.1:3005/register", {
-        fname: user.fname,
-        lname: user.lname,
-        email: user.email,
-        password: user.password,
-        cpassword: user.confirmPassword, // Ensure this line is correct
-      })
-      .then((res) => {
-        console.log(res);
+    if (Object.keys(validationErrors).length === 0) {
+      if (!user.agreedToPrivacy) {
+        setErrors({ agreedToPrivacy: "**Please agree to the privacy policy" });
+        return;
+      }
+      try {
+        const response = await axios.post("http://127.0.0.1:3005/register", {
+          fname: user.fname,
+          lname: user.lname,
+          email: user.email,
+          password: user.password,
+        });
+        console.log(response.data);
         setUser(initialUserState);
-
-        // Redirect to homepage
+        // Redirect to login page after successful registration
         window.location.href = "/login";
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
   };
 
   return (
@@ -85,7 +94,7 @@ function Signup() {
                   className="ToHomepage"
                 />
               </Link>
-              <form method="POST" className="register-form" onSubmit={postdata}>
+              <form onSubmit={handleSubmit} className="register-form">
                 <div className="signup-form-group">
                   <label htmlFor="fname"></label>
                   <input
@@ -93,10 +102,12 @@ function Signup() {
                     name="fname"
                     id="fname"
                     value={user.fname}
-                    onChange={handleInputChange}
-                    autoComplete="off"
+                    onChange={handleChange}
                     placeholder="First Name"
                   />
+                  {errors.fname && (
+                    <p className="error-message">{errors.fname}</p>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -106,25 +117,29 @@ function Signup() {
                     name="lname"
                     id="lname"
                     value={user.lname}
-                    onChange={handleInputChange}
-                    autoComplete="off"
+                    onChange={handleChange}
                     placeholder="Last Name"
                   />
+                  {errors.lname && (
+                    <p className="error-message">{errors.lname}</p>
+                  )}
                 </div>
+
                 <div className="form-group">
                   <label htmlFor="email"></label>
                   <input
-                    type="text"
+                    type="email"
                     name="email"
                     id="email"
                     value={user.email}
-                    onChange={handleInputChange}
-                    autoComplete="off"
                     placeholder="Email"
-                    onBlur={validateEmail}
+                    onChange={handleChange}
                   />
-                  {emailError && <p className="error-message">{emailError}</p>}
+                  {errors.email && (
+                    <p className="error-message">{errors.email}</p>
+                  )}
                 </div>
+
                 <div className="form-group">
                   <label htmlFor="password"></label>
                   <input
@@ -132,15 +147,14 @@ function Signup() {
                     name="password"
                     id="password"
                     value={user.password}
-                    onChange={handleInputChange}
-                    autoComplete="off"
                     placeholder="Password"
-                    onBlur={validatePassword}
+                    onChange={handleChange}
                   />
-                  {passwordError && (
-                    <p className="error-message">{passwordError}</p>
+                  {errors.password && (
+                    <p className="error-message">{errors.password}</p>
                   )}
                 </div>
+
                 <div className="form-group">
                   <label htmlFor="confirmPassword"></label>
                   <input
@@ -148,19 +162,22 @@ function Signup() {
                     name="confirmPassword"
                     id="confirmPassword"
                     value={user.confirmPassword}
-                    onChange={handleInputChange}
-                    autoComplete="off"
                     placeholder="Confirm password"
-                    onBlur={validatePasswordConfirmation}
+                    onChange={handleChange}
                   />
-                  {confirmPasswordError && (
-                    <p className="error-message">{confirmPasswordError}</p>
+                  {errors.confirmPassword && (
+                    <p className="error-message">{errors.confirmPassword}</p>
                   )}
                 </div>
-                <br />
+
                 <div className="terms-container">
                   <label className="checkbox-container">
-                    <input type="checkbox"></input>
+                    <input
+                      type="checkbox"
+                      name="agreedToPrivacy"
+                      checked={user.agreedToPrivacy}
+                      onChange={handleChange}
+                    />
                     <span className="checkmark"></span>I agree to the{" "}
                     <Link to="url-to-terms" className="link">
                       Terms and Conditions
@@ -171,15 +188,15 @@ function Signup() {
                     </Link>
                     .
                   </label>
+                  {errors.agreedToPrivacy && (
+                    <p className="error-message">{errors.agreedToPrivacy}</p>
+                  )}
                 </div>
+
                 <div className="form-group form-button">
-                  <input
-                    type="submit"
-                    className="signup-btn"
-                    name="signup"
-                    id="signup"
-                    value="Create Account"
-                  />
+                  <button type="submit" className="signup-btn">
+                    Create Account
+                  </button>
                   <p className="terms-text">
                     Already have an account?{" "}
                     <Link className="link" to="/login">

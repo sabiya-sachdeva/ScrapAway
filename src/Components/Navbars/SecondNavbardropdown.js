@@ -17,11 +17,8 @@ function SecondNavBar(props) {
   };
 
   const handleLogout = () => {
-    // Remove the token from localStorage or sessionStorage
-    localStorage.removeItem("token"); // Assuming the token is stored in localStorage
-    // Update any application state here if necessary
-    // Redirect the user
-    navigate("/login"); // Redirect to login page or home page as per your routing setup
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   return (
@@ -49,8 +46,7 @@ function SecondNavBar(props) {
               alt=""
               style={{ width: "15px", marginLeft: "6px", background: "white" }}
             />
-          </Link>{" "}
-          {/* Display fullName */}
+          </Link>
           {isDropdownVisible && (
             <div className="dropdown-content">
               <Link to="/profile">Profile</Link>

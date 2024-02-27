@@ -5,8 +5,6 @@ import FirstNavbar from "../Navbars/FirstNavbar";
 import SecondNavbardropdown from "../Navbars/SecondNavbardropdown";
 import Footer from "../Footer/Footer";
 
-//$2b$10$AzCDSOgZNLgXbGlmJ/e2m.XUtYBym/Q6Ol8Qvc0EtrkZXPfGnnDb2
-
 function Profile() {
   const [tempProfile, setTempProfile] = useState({
     firstName: "",
@@ -70,9 +68,7 @@ function Profile() {
     if (!userToken) {
       console.error("No user token found in local storage.");
       setFeedback({ message: "User not authenticated.", isError: true });
-      return;
-    }
-
+      return; }
     try {
       const response = await axios.put(
         "http://127.0.0.1:3005/updateProfile",
@@ -80,17 +76,11 @@ function Profile() {
         {
           headers: {
             Authorization: `Bearer ${userToken}`,
-          },
-        }
-      );
-      console.log(response.data); // Assuming the server returns updated profile data
-
-      // Check if the update was successful (status code 200)
+          }, });
+      console.log(response.data); 
       if (response.status === 200) {
-        // Update profile state with the updated data
         setProfile(tempProfile);
 
-        // Update feedback state
         setFeedback({
           message: "Profile updated successfully!",
           isError: false,

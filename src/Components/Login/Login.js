@@ -12,14 +12,36 @@ function Login() {
   });
 
   const navigate = useNavigate(); // Hook for programmatic navigation
+  const [errors, setErrors] = useState({});
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setCredentials({ ...credentials, [name]: value });
   };
 
+  const validate = () => {
+    const errors = {};
+
+    if (!credentials.email.trim()) {
+      errors.email = "**Email cannot be left blank";
+    }
+
+    if (!credentials.password.trim()) {
+      errors.password = "**Password cannot be left blank";
+    }
+
+    return errors; // Return the errors object
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    const validationErrors = validate();
+    setErrors(validationErrors);
+
+    // If there are validation errors, stop the form submission
+    if (Object.keys(validationErrors).length !== 0) {
+      return;
+    }
 
     try {
       const API_URL = "http://127.0.0.1:3005/login";
@@ -61,6 +83,9 @@ function Login() {
                   value={credentials.email}
                   onChange={handleInputChange}
                 />
+                {errors.email && (
+                  <p className="error-message">{errors.email}</p>
+                )}
               </div>
               <div>
                 <input
@@ -72,6 +97,10 @@ function Login() {
                   onChange={handleInputChange}
                   autoComplete="off"
                 />
+                {errors.password && (
+                  <p className="error-message">{errors.password}</p>
+                )}
+
                 <p className="terms-text">
                   Forgot your{" "}
                   <Link to="/" className="link">

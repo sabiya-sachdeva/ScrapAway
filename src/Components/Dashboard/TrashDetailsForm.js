@@ -28,11 +28,8 @@ const TrashDetailsForm = () => {
     setUser({ ...user, [name]: value });
   };
   const handleWasteTypeChange = (e) => {
-    // Get the selected options from the event object
     const selectedOptions = Array.from(e.target.selectedOptions);
-    // Extract the values of the selected options
     const selectedWasteTypes = selectedOptions.map((option) => option.value);
-    // Update the state with the selected waste types
     setUser({ ...user, typeofwaste: selectedWasteTypes });
   };
 
@@ -68,7 +65,6 @@ const TrashDetailsForm = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // handle form submission
   };
 
   return (
