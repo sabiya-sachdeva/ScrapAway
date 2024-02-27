@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 require("../Db/Db");
+const Waste = require("../models/Waste.js");
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const router = express.Router();
@@ -28,9 +29,9 @@ const verifyToken = (req, res, next) => {
 
 // Register User
 router.post("/register", async (req, res) => {
-  const { fname, lname, email, password } = req.body;
+  const { fname, lname, email, password, agreedToPrivacy } = req.body;
 
-  if (!fname || !lname || !email || !password) {
+  if (!fname || !lname || !email || !password || !agreedToPrivacy) {
     return res.status(400).json({ error: "Please fill all required fields" });
   }
 
@@ -101,7 +102,7 @@ router.post("/submit", async (req, res) => {
       email,
       pickupdate,
       typeofwaste,
-    }); //if key value same then no need to mention key :value
+    });
 
     await waste.save();
 
@@ -142,9 +143,8 @@ router.post("/forgotpass", async (req, res) => {
 
 //Get user details after login
 router.get("/userdetails", verifyToken, async (req, res) => {
-  // Using verifyToken middleware for authentication
   try {
-    const user = await User.findById(req.user.userId).select("-password"); // Assuming `req.user.userId` is set by verifyToken middleware
+    const user = await User.findById(req.user.userId).select("-password");
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -152,7 +152,7 @@ router.get("/userdetails", verifyToken, async (req, res) => {
       firstName: user.fname,
       lastName: user.lname,
       email: user.email,
-    }); // Ensure these field names match your User model
+    });
   } catch (error) {
     console.error("Error fetching user details:", error);
     res.status(500).json({ error: "Failed to fetch user details" });
@@ -163,30 +163,21 @@ router.get("/userdetails", verifyToken, async (req, res) => {
 
 router.put("/updateProfile", verifyToken, async (req, res) => {
   try {
-    // Extract updated profile details from the request body
     const { firstName, lastName, email } = req.body;
-
-    // Find the user by ID
     const userId = req.user.userId;
     const user = await User.findById(userId);
 
-    // If user not found, return 404 error
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-
-    // Update user profile details
     user.fname = firstName;
     user.lname = lastName;
     user.email = email;
 
-    // Save the updated user
     await user.save();
 
-    // Return success response
     res.status(200).json({ message: "Profile updated successfully", user });
   } catch (error) {
-    // Handle errors
     console.error("Error updating profile:", error);
     res.status(500).json({ error: "Internal server error" });
   }
