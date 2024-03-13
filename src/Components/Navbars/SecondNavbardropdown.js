@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import "./Navbar.css";
+import { useAuth } from "../AuthContext/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 
 function SecondNavBar(props) {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   // Show the dropdown menu
   const showDropdown = () => {
@@ -18,6 +20,7 @@ function SecondNavBar(props) {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    logout();
     navigate("/login");
   };
 

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-
+import { useAuth } from "../AuthContext/AuthContext"; 
 import "./Login.css";
 
 function Login() {
@@ -11,7 +11,8 @@ function Login() {
     password: "",
   });
 
-  const navigate = useNavigate(); // Hook for programmatic navigation
+  const navigate = useNavigate();
+  const { setUser } = useAuth(); // Hook for programmatic navigation
   const [errors, setErrors] = useState({});
 
   const handleInputChange = (e) => {
@@ -47,17 +48,37 @@ function Login() {
       const API_URL = "http://127.0.0.1:3005/login";
       const response = await axios.post(API_URL, credentials);
 
-      const { token } = response.data;
+      //const { token } = response.data;
+      const { token} = response.data;
       localStorage.setItem("token", token);
 
+      //setUser({ firstName: {username}}); 
       // After storing the token
-      const decodedToken = jwtDecode(token);
-      console.log(decodedToken);
+    
+        const decodedToken = jwtDecode(token);
+        if (decodedToken && decodedToken.firstName) {
+          const { firstName } = decodedToken;
+          console.log(firstName); // Check if firstName is retrieved correctly
+          setUser({ firstName });
+        } else {
+          console.error("First name not found in token payload");
+          // Handle the case where firstName is not found in the token payload
+        }
 
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Login error:", error);
-    }
+        
+        //setUser({ firstName: user.firstName });
+        console.log(decodedToken);
+        if (decodedToken.usertype === "user") {
+          navigate("/dashboard");
+        } else if (decodedToken.usertype === "collector") {
+          navigate("/collector");
+        } else {
+          console.error("Invalid user type in token:", decodedToken.usertype);
+        }
+      } catch (error) {
+        console.error("Login error:", error);
+      }
+    
   };
 
   return (
@@ -127,7 +148,7 @@ function Login() {
           </div>
         </form>
       </div>
-      {/* <SecondNavbarDropdown username={fullName} /> */}
+     
     </div>
   );
 }

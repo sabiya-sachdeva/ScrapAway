@@ -98,16 +98,6 @@
 .checkbox-container .link:hover {
   font-weight: 500;
 }
-.radiobox-container label {
-  /* Adjust the margin between checkboxes and labels */
-  margin-top: -5px; /* Add margin to the left to shift the labels */
-}
-.radiobox-container {
-  display: flex;
-}
-.radiobox-container input {
-  width: 15%;
-}
 
 /* .password-toggle-icon {
   position: absolute;
@@ -122,4 +112,23 @@
 .error-message {
   margin-top: 0px;
   color: red;
+}
+
+.radio_container p {
+  font-size: x-small;
+  padding-top: 5px;
+  margin: auto;
+}
+.radio_row {
+  display: flex;
+}
+
+.radio_row label {
+  display: flex;
+  padding: 10px;
+  flex-grow: 1; /* Equal division */
+}
+
+.radio_row input[type="radio"] {
+  margin: auto 0; /* Adjust as needed */
 }

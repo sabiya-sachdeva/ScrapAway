@@ -3,6 +3,7 @@
 .footer {
   margin: 100px 35px;
   display: flex;
+  text-align: left;
 }
 
 .footer-content {
@@ -12,7 +13,7 @@
 }
 
 .footer ul {
-  list-style-type: none; /* Remove bullet points */
+  list-style-type: none;
   margin: 0;
   padding: 0;
 }
@@ -38,6 +39,7 @@
 
 .socials {
   margin-right: 15px;
+  text-align: left;
 }
 
 .footflex {

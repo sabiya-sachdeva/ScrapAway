@@ -12,10 +12,15 @@ function Dashboard() {
   useEffect(() => {
     if (!user) {
       navigate("/login");
-    } else {
+    } 
+    else {
       setFirstName(user.firstName);
     }
   }, [user, navigate]);
+  useEffect(() => {
+    // Update firstName when user changes
+    setFirstName(user.firstName);
+  }, [user]);
 
   return (
     <>

@@ -12,6 +12,7 @@ function Signup() {
     password: "",
     confirmPassword: "",
     agreedToPrivacy: false,
+    usertype: "",
   };
 
   const [user, setUser] = useState(initialUserState);
@@ -51,6 +52,12 @@ function Signup() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUser({ ...user, [name]: value });
+
+    // if (name === "usertype") {
+    //   setUser({ ...user, userType: value });
+    // } else {
+    //   setUser({ ...user, [name]: value });
+    // }
   };
 
   const handleSubmit = async (e) => {
@@ -69,7 +76,9 @@ function Signup() {
           lname: user.lname,
           email: user.email,
           password: user.password,
+          usertype: user.usertype,
         });
+
         console.log(response.data);
         setUser(initialUserState);
         // Redirect to login page after successful registration
@@ -168,6 +177,34 @@ function Signup() {
                   {errors.confirmPassword && (
                     <p className="error-message">{errors.confirmPassword}</p>
                   )}
+                </div>
+                <div className="radio_container">
+                  <p>
+                    Please verify whether you are a Garbage Disposer or a
+                    Collector?
+                  </p>
+                  <div className="radio_row">
+                    <label>
+                      <input
+                        type="radio"
+                        name="usertype"
+                        value="user"
+                        checked={user.usertype === "user"}
+                        onChange={handleChange}
+                      />
+                      Disposer
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="usertype"
+                        value="collector"
+                        checked={user.usertype === "collector"}
+                        onChange={handleChange}
+                      />
+                      Collector
+                    </label>
+                  </div>
                 </div>
 
                 <div className="terms-container">
