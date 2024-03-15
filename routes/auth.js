@@ -1,6 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const bcrypt = require("bcrypt");
+const multer = require('multer');
+
 
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
@@ -17,6 +19,7 @@ const router = express.Router();
 // Middleware to verify the token
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
+
   if (authHeader && authHeader.startsWith("Bearer ")) {
     const token = authHeader.split(" ")[1];
 
@@ -102,11 +105,30 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.post("/submit", async (req, res) => {
-  const { name, contactno, address, pincode, email, pickupdate, typeofwaste } =
-    req.body;
+
+const path = require('path');
+
+
+// Multer configuration for file upload
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    // cb(null, './uploads'); 
+    cb(null, 'uploads')// Save uploaded files to the 'uploads' folder
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // Rename uploaded files with a unique name
+  }
+});
+
+const upload = multer({ storage: storage });
+
+router.post("/submit", upload.single('image'), async (req, res) => {
+  const { name, contactno, address, pincode, email, pickupdate, typeofwaste } = req.body;
+  const imagePath = req.file ? req.file.path : ''; // Check if req.file exists
+
 
   try {
+    await connectDb();
     const waste = new Waste({
       name,
       contactno,
@@ -115,6 +137,7 @@ router.post("/submit", async (req, res) => {
       email,
       pickupdate,
       typeofwaste,
+     imagePath
     });
 
     await waste.save();
@@ -122,56 +145,71 @@ router.post("/submit", async (req, res) => {
     res.status(201).json({ message: "data saved" });
   } catch (err) {
     console.log(err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-router.get("/user",async(req,res)=>{
-  try{
+ const uploadsPath = path.join(__dirname, '..', 'uploads'); // Assuming the uploads folder is located at the root level of your project
+
+ router.use('/uploads', express.static(uploadsPath));
+// router.use('/uploads',express.static('uploads'))
+router.get("/user", async (req, res) => {
+  try {
     await connectDb();
-  const userdata=await Waste.find();
-  if(userdata.length>0){
-    res.status(200).json(userdata)
+    const userdata = await Waste.find();
+    console.log(userdata);
+
+    if (!userdata) {
+      // Handle case where no data is found
+      return res.status(404).json({ message: "No user data found" });
+    }
+  
+    const usersWithImageUrl = userdata.map(user => {
+      return {
+        ...user._doc,
+         imagePath: `/uploads/${user.imagePath}`
+        
+         // Modify imagePath to contain the URL
+      };
+    });
+
+    res.json(usersWithImageUrl);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
   }
-  else{
-    res.status(404).json({message:"no data found"})
-  }
-}
-catch(err){
-  console.error(err);
-  res.status(500).json({message:"internal server error"})
-}
 });
 
 
 
 //forget password
-router.post("/forgotpass", async (req, res) => {
-  const { email, password, cpassword } = req.body;
+// router.post("/forgotpass", async (req, res) => {
+//   const { email, password, confirmPassword} = req.body;
 
-  try {
-    // Check if the user exists with the provided email
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ error: "Email id not exist" });
-    }
+//   try {
+//     // Check if the user exists with the provided email
+//     const user = await User.findOne({ email });
+//     if (!user) {
+//       return res.status(404).json({ error: "Email id not exist" });
+//     }
 
-    // You might want to validate the password and cpassword here
+//     // You might want to validate the password and cpassword here
 
-    // Update user password
-    user.password = password;
-    user.cpassword = cpassword;
-    if (password != cpassword) {
-      return res.status(422).json({ error: "Passwords do not match" });
-    }
-    // Save the updated user
-    await user.save();
+//     // Update user password
+//     user.password = newPassword;
+//     user.confirmPassword = confirmPassword;
+//     if (password != cpassword) {
+//       return res.status(422).json({ error: "Passwords do not match" });
+//     }
+//     // Save the updated user
+//     await user.save();
 
-    res.status(200).json({ message: "Password updated successfully" });
-  } catch (error) {
-    console.error("Error updating password:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
+//     res.status(200).json({ message: "Password updated successfully" });
+//   } catch (error) {
+//     console.error("Error updating password:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// });
 
 //Get user details after login
 router.get("/userdetails", verifyToken, async (req, res) => {
@@ -248,6 +286,42 @@ router.put("/updatePassword", verifyToken, async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+// Assume you have an endpoint like this in your backend
+
+
+router.get("/searchwaste", async (req, res) => {
+  const { searchInput } = req.query;
+  try {
+    await connectDb();
+    let filteredData = [];
+
+    if (searchInput) {
+      filteredData = await Waste.find({
+        typeofwaste: { $regex: new RegExp(searchInput, "i") },
+      });
+    } else {
+      filteredData = await Waste.find();
+    }
+
+    // Format imagePath to contain the URL
+    const filteredDataWithImageUrl = filteredData.map((user) => {
+      return {
+        ...user._doc,
+        imagePath: `/uploads/${user.imagePath}`
+        
+      };
+    });
+
+    res.json(filteredDataWithImageUrl);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+
 
 
 
