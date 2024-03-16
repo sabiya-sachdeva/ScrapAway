@@ -10,9 +10,11 @@ import Profile from "./Components/Profile/Profile";
 import TrackOrder from "./Components/TrackOrder/TrackOrder";
 import Login from "./Components/Login/Login";
 import "./App.css";
-import Collector from "./Components/Collector/Collector";
+import Collector from "./Components/Collector/CollectorDashboard";
+import ForgetPassword from "./Components/Login/ForgetPassword"
 
 function App() {
+  const login=localStorage.getItem("isloggedin")
   return (
     <Routes>
       <Route path="/" element={<Home />} />
@@ -25,6 +27,8 @@ function App() {
       <Route path="/track-order" element={<TrackOrder />} />
       <Route path="/track-order" element={<TrackOrder />} />
       <Route path="/collector" element={<Collector />} />
+      <Route path="/forgotpass" element={<ForgetPassword/>} />
+
     </Routes>
   );
 }

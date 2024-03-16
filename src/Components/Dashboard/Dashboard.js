@@ -9,23 +9,23 @@ function Dashboard() {
   const [firstName, setFirstName] = useState("");
   const navigate = useNavigate();
   const { user } = useAuth();
+
   useEffect(() => {
     if (!user) {
       navigate("/login");
-    } 
-    else {
-      setFirstName(user.firstName);
+    } else {
+      // Check if user.firstName exists before setting it
+      if (user.firstName) {
+        setFirstName(user.firstName);
+      }
     }
   }, [user, navigate]);
-  useEffect(() => {
-    // Update firstName when user changes
-    setFirstName(user.firstName);
-  }, [user]);
 
   return (
     <>
       <FirstNavbar />
-      <SecondNavbardropdown username={firstName} />
+      {/* Only render SecondNavbardropdown if firstName is available */}
+      {firstName && <SecondNavbardropdown username={firstName} />}
       <TrashDetailsForm />
     </>
   );

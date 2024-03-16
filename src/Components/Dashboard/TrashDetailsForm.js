@@ -18,6 +18,7 @@ const TrashDetailsForm = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [step, setStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState(null);
+  const[image,setImage]=useState('');
   let name, value;
   const handleinput = (e) => {
     console.log(e);
@@ -38,12 +39,25 @@ const TrashDetailsForm = () => {
     console.log(date);
     setUser({ ...user, pickupdate: date });
   };
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    setImage(file);
+  };
 
   const postdata = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append("name", user.name);
+    formData.append("contactno", user.contactno);
+    formData.append("address", user.address);
+    formData.append("pincode", user.pincode);
+    formData.append("email", user.email);
+    formData.append("pickupdate", user.pickupdate);
+    formData.append("typeofwaste", user.typeofwaste.join(","));
+    formData.append("image", image);
 
     axios
-      .post("http://127.0.0.1:3005/submit", user)
+      .post("http://127.0.0.1:3005/submit", formData)
 
       .then((res) => {
         console.log(res);
@@ -101,6 +115,14 @@ const TrashDetailsForm = () => {
                 />
                 <br />
                 <input
+                  type="text"
+                  name="email"
+                  placeholder="Email"
+                  onChange={handleinput}
+                  value={user.email}
+                />
+                <br />
+                <input
                   type="button"
                   name="next"
                   className="action-button"
@@ -129,12 +151,13 @@ const TrashDetailsForm = () => {
                   style={{ width: "20%" }}
                 />
                 <input
-                  type="text"
-                  name="email"
-                  placeholder="Email"
-                  onChange={handleinput}
-                  value={user.email}
+                  type="file"
+                  name="image"
+                  placeholder="Upload Image"
+                  onChange={handleImageUpload}
+                  // value={user.email}
                 />
+               
                 <br />
                 <input
                   type="button"

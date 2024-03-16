@@ -3,6 +3,7 @@
 .footer {
   margin: 100px 35px;
   display: flex;
+  text-align: left;
 }
 
 .footer-content {
