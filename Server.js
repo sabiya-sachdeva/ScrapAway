@@ -19,15 +19,18 @@ const imageData = [
 ];
 
 const Data = [
-  { id: 5, name: "Hazardous Waste", image: "./Types/hazardous.jpg", rate: 10 },
+  { 
+    id: 5, name: "Hazardous Waste", image: "./Types/hazardous.jpg", rate: 10 },
   {
     id: 6,
     name: "Plastic Bottles & Cans",
     image: "./Types/plastic.jpg",
     rate: 1,
   },
-  { id: 7, name: "Medicine Waste", image: "./Types/medicine.jpg", rate: 5 },
-  { id: 8, name: "Bulky Waste", image: "./Types/bulky.jpg", rate: 5 },
+  { 
+    id: 7, name: "Medicine Waste", image: "./Types/medicine.jpg", rate: 5 },
+  { 
+    id: 8, name: "Bulky Waste", image: "./Types/bulky.jpg", rate: 5 },
 ];
 
 // Set up a route to fetch data

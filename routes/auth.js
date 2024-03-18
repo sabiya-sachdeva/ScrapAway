@@ -1,17 +1,25 @@
 require("dotenv").config();
 const express = require("express");
 const bcrypt = require("bcrypt");
+const multer = require('multer');
+
+
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-require("../Db/Db");
+
+const connectDb=require("../Db/Db.js")
+
 const Waste = require("../models/Waste.js");
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const router = express.Router();
 
+// const Product=require("../models/product.js")
+
 // Middleware to verify the token
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
+
   if (authHeader && authHeader.startsWith("Bearer ")) {
     const token = authHeader.split(" ")[1];
 
@@ -29,13 +37,14 @@ const verifyToken = (req, res, next) => {
 
 // Register User
 router.post("/register", async (req, res) => {
-  const { fname, lname, email, password, agreedToPrivacy } = req.body;
+  const { fname, lname, email, password,usertype } = req.body;
 
-  if (!fname || !lname || !email || !password || !agreedToPrivacy) {
+  if (!fname || !lname || !email || !password || !usertype) {
     return res.status(400).json({ error: "Please fill all required fields" });
   }
 
   try {
+    await connectDb();
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(409).json({ error: "Email already exists" });
@@ -49,10 +58,15 @@ router.post("/register", async (req, res) => {
       lname,
       email,
       password: hashedPassword,
+      usertype
     });
 
     await user.save();
-    res.status(201).json({ message: "User registered successfully" });
+    const token = jwt.sign({ userId: user._id, usertype }, JWT_SECRET, {
+      expiresIn: "12h",
+    });
+    res.status(201).json({ token });
+    //res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
@@ -68,17 +82,19 @@ router.post("/login", async (req, res) => {
   }
 
   try {
+    await connectDb();
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
+    const tokenPayload = {
+      userId: user._id,
+      usertype: user.usertype,
+      firstName: user.fname, // Add the first name to the token payload
+    };
 
-    // const isMatch = await bcrypt.compare(password, user.password);
-    // if (!isMatch) {
-    //   return res.status(401).json({ error: "Invalid credentials" });
-    // }
 
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+    const token = jwt.sign(tokenPayload, JWT_SECRET, {
       expiresIn: "12h",
     });
 
@@ -89,11 +105,30 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.post("/submit", async (req, res) => {
-  const { name, contactno, address, pincode, email, pickupdate, typeofwaste } =
-    req.body;
+
+const path = require('path');
+
+
+// Multer configuration for file upload
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    // cb(null, './uploads'); 
+    cb(null, 'uploads')// Save uploaded files to the 'uploads' folder
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // Rename uploaded files with a unique name
+  }
+});
+
+const upload = multer({ storage: storage });
+
+router.post("/submit", upload.single('image'), async (req, res) => {
+  const { name, contactno, address, pincode, email, pickupdate, typeofwaste } = req.body;
+  const imagePath = req.file ? req.file.path : ''; // Check if req.file exists
+
 
   try {
+    await connectDb();
     const waste = new Waste({
       name,
       contactno,
@@ -102,6 +137,7 @@ router.post("/submit", async (req, res) => {
       email,
       pickupdate,
       typeofwaste,
+     imagePath
     });
 
     await waste.save();
@@ -109,41 +145,76 @@ router.post("/submit", async (req, res) => {
     res.status(201).json({ message: "data saved" });
   } catch (err) {
     console.log(err);
-  }
-});
-
-//forget password
-router.post("/forgotpass", async (req, res) => {
-  const { email, password, cpassword } = req.body;
-
-  try {
-    // Check if the user exists with the provided email
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ error: "Email id not exist" });
-    }
-
-    // You might want to validate the password and cpassword here
-
-    // Update user password
-    user.password = password;
-    user.cpassword = cpassword;
-    if (password != cpassword) {
-      return res.status(422).json({ error: "Passwords do not match" });
-    }
-    // Save the updated user
-    await user.save();
-
-    res.status(200).json({ message: "Password updated successfully" });
-  } catch (error) {
-    console.error("Error updating password:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
+ const uploadsPath = path.join(__dirname, '..', 'uploads'); // Assuming the uploads folder is located at the root level of your project
+
+ router.use('/uploads', express.static(uploadsPath));
+// router.use('/uploads',express.static('uploads'))
+router.get("/user", async (req, res) => {
+  try {
+    await connectDb();
+    const userdata = await Waste.find();
+    console.log(userdata);
+
+    if (!userdata) {
+      // Handle case where no data is found
+      return res.status(404).json({ message: "No user data found" });
+    }
+  
+    const usersWithImageUrl = userdata.map(user => {
+      return {
+        ...user._doc,
+         imagePath: `/uploads/${user.imagePath}`
+        
+         // Modify imagePath to contain the URL
+      };
+    });
+
+    res.json(usersWithImageUrl);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+
+//forget password
+// router.post("/forgotpass", async (req, res) => {
+//   const { email, password, confirmPassword} = req.body;
+
+//   try {
+//     // Check if the user exists with the provided email
+//     const user = await User.findOne({ email });
+//     if (!user) {
+//       return res.status(404).json({ error: "Email id not exist" });
+//     }
+
+//     // You might want to validate the password and cpassword here
+
+//     // Update user password
+//     user.password = newPassword;
+//     user.confirmPassword = confirmPassword;
+//     if (password != cpassword) {
+//       return res.status(422).json({ error: "Passwords do not match" });
+//     }
+//     // Save the updated user
+//     await user.save();
+
+//     res.status(200).json({ message: "Password updated successfully" });
+//   } catch (error) {
+//     console.error("Error updating password:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// });
+
 //Get user details after login
 router.get("/userdetails", verifyToken, async (req, res) => {
   try {
+    await connectDb();
     const user = await User.findById(req.user.userId).select("-password");
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -213,6 +284,32 @@ router.put("/updatePassword", verifyToken, async (req, res) => {
   } catch (error) {
     console.error("Error updating password:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/searchwaste", async (req, res) => {
+  const { types } = req.query; // "types" will be a comma-separated string of selected waste types
+  try {
+    await connectDb();
+    let query = {};
+
+    if (types) {
+      const typesArray = types.split(","); // Convert the string into an array of types
+      query.typeofwaste = { $in: typesArray };
+    }
+
+    const filteredData = await Waste.find(query);
+
+    // Format imagePath to contain the URL
+    const filteredDataWithImageUrl = filteredData.map((user) => ({
+      ...user._doc,
+      imagePath: `/uploads/${user.imagePath}`,
+    }));
+
+    res.json(filteredDataWithImageUrl);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 

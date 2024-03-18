@@ -34,13 +34,14 @@ const wasteSchema=new mongoose.Schema
         type: [String],
         required:true
         
-    }
+    },
+    imagePath: {
+        type: String,
+        required:true
+        // data: Buffer,
+        // contentType: String
+      }
 })
-
-
-
-
-
 
 const Waste=mongoose.model('WASTE',wasteSchema);
 
