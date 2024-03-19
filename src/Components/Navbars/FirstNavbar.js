@@ -1,4 +1,5 @@
-import "../App.css";
+import { Link } from "react-router-dom";
+import "./Navbar.css";
 
 function FirstNavbar() {
   return (
@@ -6,19 +7,19 @@ function FirstNavbar() {
       <nav className="nav1">
         <ul>
           <li>
-            <a href="/">
+            <Link to="/">
               <img src="SAlogo.png" alt="Logo" height="50px" />
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/">
+            <Link to="/sorting">
               <img src="WSG.png" alt="WSG" height="50px" />
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/">
+            <Link to="/collabs">
               <img src="SAC.png" alt="SAC" height="50px" />
-            </a>
+            </Link>
           </li>
         </ul>
       </nav>

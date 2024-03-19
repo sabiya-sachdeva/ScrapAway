@@ -1,0 +1,52 @@
+.loginForm {
+  font-family: "Poppins", sans-serif;
+  text-align: center;
+  border-radius: 20px;
+  width: 100%;
+}
+
+.loginForm input {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 30px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  border: 2px solid #d7d7d7;
+}
+
+.login-btn {
+  background-color: #000000;
+  text-decoration: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  margin: 10px 0px;
+  width: 100%;
+  padding: 15px;
+  border-radius: 30px;
+  cursor: pointer;
+}
+
+.login-btn:hover {
+  background-color: #313131;
+}
+
+.passwod-container {
+  position: relative; /* Set the container position to relative */
+}
+
+.passwod-container input[type="password"] {
+  padding-right: 20px; /* Add padding to the right for the image */
+}
+
+.eyeimage {
+  position: absolute; /* Set the image position to absolute */
+  top: 55%; /* Position the image vertically in the middle */
+  right: 10px; /* Position the image 10 pixels from the right */
+  transform: translateY(
+    -70%
+  ); /* Adjust the image position to be vertically centered */
+  height: 30%;
+}

@@ -1,0 +1,22 @@
+.track-order-body {
+  margin: 20px 100px;
+  height: 100vh;
+  background-color: #ffffff;
+  padding: 50px;
+  border-radius: 20px;
+}
+
+.track-heading {
+  text-align: left;
+  font-weight: 500;
+  margin: 0;
+}
+
+.horizontal-line {
+  border: 1px solid rgb(164, 164, 164);
+  width: 100%;
+}
+
+.track-orders {
+  text-align: left;
+}
