@@ -13,7 +13,7 @@
 }
 
 .footer ul {
-  list-style-type: none;
+  list-style-type: none; /* Remove bullet points */
   margin: 0;
   padding: 0;
 }
@@ -39,7 +39,6 @@
 
 .socials {
   margin-right: 15px;
-  text-align: left;
 }
 
 .footflex {

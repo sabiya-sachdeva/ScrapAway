@@ -22,28 +22,28 @@ function Signup() {
     const errors = {};
 
     if (!user.fname.trim()) {
-      errors.fname = "**First name is required";
+      errors.fname = "*First name is required.";
     }
     if (!user.lname.trim()) {
-      errors.lname = "**Last name is required";
+      errors.lname = "*Last name is required.";
     }
     if (!user.email.trim()) {
-      errors.email = "**Email is required";
+      errors.email = "*Email is required";
     } else if (!/\S+@\S+\.\S+/.test(user.email)) {
-      errors.email = "**Email address is invalid";
+      errors.email = "*Email address is invalid.";
     }
     if (!user.password.trim()) {
-      errors.password = "**Password is required";
+      errors.password = "*Password is required.";
     } else if (user.password.length < 8) {
-      errors.password = "**Password must be at least 8 characters long";
+      errors.password = "*Password must be at least 8 characters long.";
     }
     if (!user.confirmPassword.trim()) {
-      errors.confirmPassword = "**Confirm password is required";
+      errors.confirmPassword = "Confirm password is required.";
     } else if (user.confirmPassword !== user.password) {
-      errors.confirmPassword = "**Passwords do not match";
+      errors.confirmPassword = "*Passwords do not match.";
     }
     if (!user.agreedToPrivacy) {
-      errors.agreedToPrivacy = "**Please agree to the privacy policy";
+      errors.agreedToPrivacy = "*Please agree to the privacy policy.";
     }
 
     return errors;

@@ -25,7 +25,7 @@
   cursor: pointer;
   font-size: 16px;
   transition: background-color 0.3s ease;
-  margin: 20px 0px;
+  margin: 10px 0px;
   width: 100%;
   padding: 15px;
   border-radius: 30px;
@@ -125,10 +125,12 @@
 
 .radio_row label {
   display: flex;
-  padding: 10px;
+  padding: 5px;
   flex-grow: 1; /* Equal division */
 }
 
 .radio_row input[type="radio"] {
-  margin: auto 0; /* Adjust as needed */
+  margin: auto 0;
+  margin-right: 10px;
+  width: auto;
 }

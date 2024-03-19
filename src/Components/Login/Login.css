@@ -5,10 +5,6 @@
   width: 100%;
 }
 
-.loginForm p {
-  font-size: small;
-}
-
 .loginForm input {
   width: 100%;
   padding: 12px;
@@ -26,7 +22,7 @@
   cursor: pointer;
   font-size: 16px;
   transition: background-color 0.3s ease;
-  margin: 20px 0px;
+  margin: 10px 0px;
   width: 100%;
   padding: 15px;
   border-radius: 30px;
@@ -37,7 +33,20 @@
   background-color: #313131;
 }
 
-.error-message {
-  margin-top: 0px;
-  color: red;
+.passwod-container {
+  position: relative; /* Set the container position to relative */
+}
+
+.passwod-container input[type="password"] {
+  padding-right: 20px; /* Add padding to the right for the image */
+}
+
+.eyeimage {
+  position: absolute; /* Set the image position to absolute */
+  top: 55%; /* Position the image vertically in the middle */
+  right: 10px; /* Position the image 10 pixels from the right */
+  transform: translateY(
+    -70%
+  ); /* Adjust the image position to be vertically centered */
+  height: 30%;
 }

@@ -65,6 +65,7 @@
   font-size: 0.7em;
   text-align: center;
   margin: auto;
+  font-size: small;
 }
 
 .terms-text .link {
@@ -74,4 +75,12 @@
 
 .terms-text .link:hover {
   font-weight: 500;
+}
+
+.error-message {
+  color: red;
+  text-align: left;
+  margin-left: 15px;
+  font-size: small;
+  margin-bottom: 0;
 }
