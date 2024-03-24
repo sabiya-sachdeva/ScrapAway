@@ -1,13 +1,14 @@
 require("dotenv").config();
 const express = require("express");
+const app = express();
+app.use(express.static("public"));
 const bcrypt = require("bcrypt");
-const multer = require('multer');
-
+const multer = require("multer");
 
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-const connectDb=require("../Db/Db.js")
+const connectDb = require("../Db/Db.js");
 
 const Waste = require("../models/Waste.js");
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -37,7 +38,7 @@ const verifyToken = (req, res, next) => {
 
 // Register User
 router.post("/register", async (req, res) => {
-  const { fname, lname, email, password,usertype } = req.body;
+  const { fname, lname, email, password, usertype } = req.body;
 
   if (!fname || !lname || !email || !password || !usertype) {
     return res.status(400).json({ error: "Please fill all required fields" });
@@ -58,7 +59,7 @@ router.post("/register", async (req, res) => {
       lname,
       email,
       password: hashedPassword,
-      usertype
+      usertype,
     });
 
     await user.save();
@@ -93,7 +94,6 @@ router.post("/login", async (req, res) => {
       firstName: user.fname, // Add the first name to the token payload
     };
 
-
     const token = jwt.sign(tokenPayload, JWT_SECRET, {
       expiresIn: "12h",
     });
@@ -105,31 +105,30 @@ router.post("/login", async (req, res) => {
   }
 });
 
-
-const path = require('path');
-
+const path = require("path");
 
 // Multer configuration for file upload
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // cb(null, './uploads'); 
-    cb(null, 'uploads')// Save uploaded files to the 'uploads' folder
+    // cb(null, './uploads');
+    cb(null, "uploads"); // Save uploaded files to the 'uploads' folder
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + path.extname(file.originalname)); // Rename uploaded files with a unique name
-  }
+  },
 });
 
 const upload = multer({ storage: storage });
 
-router.post("/submit", upload.single('image'), async (req, res) => {
-  const { name, contactno, address, pincode, email, pickupdate, typeofwaste } = req.body;
-  const imagePath = req.file ? req.file.path : ''; // Check if req.file exists
-
+router.post("/submit", upload.single("image"), async (req, res) => {
+  const { name, contactno, address, pincode, email, pickupdate, typeofwaste } =
+    req.body;
+  const imagePath = req.file ? req.file.path : ""; // Check if req.file exists
 
   try {
     await connectDb();
     const waste = new Waste({
+      user: req.user.userId,
       name,
       contactno,
       address,
@@ -137,7 +136,7 @@ router.post("/submit", upload.single('image'), async (req, res) => {
       email,
       pickupdate,
       typeofwaste,
-     imagePath
+      imagePath, // ObjectId of the user
     });
 
     await waste.save();
@@ -149,9 +148,9 @@ router.post("/submit", upload.single('image'), async (req, res) => {
   }
 });
 
- const uploadsPath = path.join(__dirname, '..', 'uploads'); // Assuming the uploads folder is located at the root level of your project
+const uploadsPath = path.join(__dirname, "..", "uploads"); // Assuming the uploads folder is located at the root level of your project
 
- router.use('/uploads', express.static(uploadsPath));
+router.use("/uploads", express.static(uploadsPath));
 // router.use('/uploads',express.static('uploads'))
 router.get("/user", async (req, res) => {
   try {
@@ -163,13 +162,13 @@ router.get("/user", async (req, res) => {
       // Handle case where no data is found
       return res.status(404).json({ message: "No user data found" });
     }
-  
-    const usersWithImageUrl = userdata.map(user => {
+
+    const usersWithImageUrl = userdata.map((user) => {
       return {
         ...user._doc,
-         imagePath: `/uploads/${user.imagePath}`
-        
-         // Modify imagePath to contain the URL
+        imagePath: `/uploads/${user.imagePath}`,
+
+        // Modify imagePath to contain the URL
       };
     });
 
@@ -179,8 +178,6 @@ router.get("/user", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
-
 
 //forget password
 // router.post("/forgotpass", async (req, res) => {

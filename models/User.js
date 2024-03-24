@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
+
 const userSchema = new Schema({
   fname: {
     type: String,
@@ -18,10 +19,15 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
-  usertype:{
+  usertype: {
     type: String,
     required: true,
-  }
+  },
+  profileimg: {
+    type: String,
+    required: true,
+    default: "user.png",
+  },
 });
 
 const User = mongoose.model("USER", userSchema);
