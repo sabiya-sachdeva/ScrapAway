@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import "./Login.css";
+import "./ForgetPassword.css";
 
 function Forgotpass() {
   const [credentials, setCredentials] = useState({
@@ -51,14 +51,15 @@ function Forgotpass() {
       const response = await axios.post(API_URL, credentials);
 
       // Handle response from the server if needed
+      console.log(response.data);
     } catch (error) {
       console.error("Forgot password error:", error);
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+  // const togglePasswordVisibility = () => {
+  //   setShowPassword(!showPassword);
+  // };
 
   return (
     <div className="cta-login-body">
@@ -98,12 +99,12 @@ function Forgotpass() {
                     onChange={handleInputChange}
                     autoComplete="off"
                   />
-                  <img
+                   {/* <img
                     src={showPassword ? "eye-open.png" : "eye-close.png"}
                     alt=""
                     className="eyeimage"
                     onClick={togglePasswordVisibility}
-                  />
+                  /> */}
                   {errors.newPassword && (
                     <p className="error-message">{errors.newPassword}</p>
                   )}
@@ -117,12 +118,6 @@ function Forgotpass() {
                     value={credentials.confirmPassword}
                     onChange={handleInputChange}
                     autoComplete="off"
-                  />
-                  <img
-                    src={showPassword ? "eye-open.png" : "eye-close.png"}
-                    alt=""
-                    className="eyeimage"
-                    onClick={togglePasswordVisibility}
                   />
                   {errors.confirmPassword && (
                     <p className="error-message">{errors.confirmPassword}</p>

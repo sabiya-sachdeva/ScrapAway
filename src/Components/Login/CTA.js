@@ -33,7 +33,7 @@ function CTA() {
                 Terms of Use
               </Link>{" "}
               and{" "}
-              <Link className="link" to="/">
+              <Link className="link" to="/privacypolicy">
                 {" "}
                 Privacy Policy
               </Link>

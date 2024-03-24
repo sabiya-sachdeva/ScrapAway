@@ -9,6 +9,8 @@ import Dashboard from "./Components/Dashboard/Dashboard";
 import Profile from "./Components/Profile/Profile";
 import TrackOrder from "./Components/TrackOrder/TrackOrder";
 import Login from "./Components/Login/Login";
+import PrivacyPolicy from "./Components/Login/PrivacyPolicy";
+import AboutUs from "./Components/AboutUs/AboutUs";
 import "./App.css";
 import Collector from "./Components/Collector/CollectorDashboard";
 import ForgetPassword from "./Components/Login/ForgetPassword"
@@ -28,6 +30,8 @@ function App() {
       <Route path="/track-order" element={<TrackOrder />} />
       <Route path="/collector" element={<Collector />} />
       <Route path="/forgotpass" element={<ForgetPassword/>} />
+      <Route path="/privacypolicy" element={<PrivacyPolicy/> } />
+      <Route path="/AboutUs" element={<AboutUs/> } />
 
     </Routes>
   );

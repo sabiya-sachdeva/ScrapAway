@@ -10,7 +10,7 @@ function SecondNavbar(props) {
             <Link to="/blog">Blog</Link>
           </li>
           <li>
-            <Link to="/about">About</Link>
+            <Link to="/AboutUs">About</Link>
           </li>
           <li>
             <Link to="/">Contact</Link>
