@@ -18,7 +18,7 @@ const TrashDetailsForm = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [step, setStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState(null);
-  const[image,setImage]=useState('');
+  const [image, setImage] = useState("");
   let name, value;
   const handleinput = (e) => {
     console.log(e);
@@ -155,9 +155,7 @@ const TrashDetailsForm = () => {
                   name="image"
                   placeholder="Upload Image"
                   onChange={handleImageUpload}
-                  // value={user.email}
                 />
-               
                 <br />
                 <input
                   type="button"

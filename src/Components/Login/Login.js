@@ -60,11 +60,11 @@ function Login() {
     const errors = {};
 
     if (!credentials.email.trim()) {
-      errors.email = "**Email cannot be left blank";
+      errors.email = "*Email is required.";
     }
 
     if (!credentials.password.trim()) {
-      errors.password = "**Password cannot be left blank";
+      errors.password = "*Password is required.";
     }
 
     return errors;

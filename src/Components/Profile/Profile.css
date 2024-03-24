@@ -8,7 +8,6 @@
 
 .profile-card {
   flex: 1;
-  padding: 20px;
   background: #fff;
   border-radius: 20px;
 }
@@ -20,14 +19,56 @@
   gap: 10px;
 }
 
-.profile-pic {
-  background-image: url("/public/user.png");
-  background-size: cover;
-  border-radius: 50%;
-  border: 3px solid rgb(247, 247, 247);
-  width: 200px;
-  height: 200px;
+.profile-pic-section {
+  position: relative;
+  width: 170px;
+  height: 170px;
   margin: 0 auto 10px;
+  margin-top: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.profile-pic {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  transition: filter 0.3s ease;
+}
+
+.profile-pic-section:hover .profile-pic {
+  filter: blur(1px);
+}
+
+.profile-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: background-color 0.3s ease, opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.profile-pic-section:hover .profile-overlay {
+  background-color: rgba(0, 0, 0, 0.7); /* Show overlay on hover */
+  opacity: 1;
+}
+
+.profile-pic-section .profile-overlay .camera-icon {
+  color: white;
+  font-size: 24px;
+  display: none;
+}
+
+.profile-pic-section:hover .profile-overlay .camera-icon {
+  display: block;
 }
 
 .edit-profile,
@@ -37,10 +78,14 @@
   border-radius: 20px;
 }
 
+.profile-details-section {
+  padding: 20px 0px;
+}
+
 .form-section {
   display: flex;
   align-items: center;
-  margin: 10px;
+  margin: 5px;
   padding-top: 10px;
 }
 
@@ -115,16 +160,23 @@
 }
 
 .update-label {
-  padding: 0px 10px;
+  margin: 0 10px;
   font-weight: 600;
   font-size: large;
   text-align: left;
-  margin: 0px auto;
 }
 
 .feedback-message {
   font-size: small;
-  color: red;
   text-align: right;
   padding: 0px 10px;
+  font-weight: 500;
+}
+
+.feedback-message.error {
+  color: red;
+}
+
+.feedback-message.success {
+  color: #5cb85c;
 }
