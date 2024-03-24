@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+// user schema
 const { Schema } = mongoose;
 const userSchema = new Schema({
   fname: {
