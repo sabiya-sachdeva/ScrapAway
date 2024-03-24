@@ -5,33 +5,47 @@ import FirstNavbar from "../Navbars/FirstNavbar";
 import SecondNavbardropdown from "../Navbars/SecondNavbardropdown";
 import Footer from "../Footer/Footer";
 
+// $2b$10$3SouIyqdgvtUvv2vBuoWQuADXLwPMWla/w4KeqVPqYekqlZNtU2Zm
+// $2b$10$/d9pucXIXqI7ruRLsvwP1O62xiY78oI9dURHJUHXFY6Pkj1gSGdYe
+// $2b$10$wqPi4Y2imHOiG4EG7QN/GOmkzEI3wbvcGFIZ61r53OCK2X0qyi7.K
+
 function Profile() {
   const [tempProfile, setTempProfile] = useState({
     firstName: "",
     lastName: "",
     email: "",
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
   });
 
   const [profile, setProfile] = useState({
     firstName: "",
     lastName: "",
     email: "",
+    profileimg: "",
+  });
+
+  const [passwords, setPasswords] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
 
-  const [feedback, setFeedback] = useState({ message: "", isError: false });
+  const [profileFeedback, setProfileFeedback] = useState([]);
+  const [passwordFeedback, setPasswordFeedback] = useState([]);
+
+  const addProfileFeedback = (message, isError = false) => {
+    setProfileFeedback([{ message, isError }]);
+  };
+
+  const addPasswordFeedback = (message, isError = false) => {
+    setPasswordFeedback([{ message, isError }]);
+  };
 
   useEffect(() => {
     const fetchProfileData = async () => {
       const userToken = localStorage.getItem("token");
       if (!userToken) {
         console.error("No user token found in local storage.");
-        setFeedback({ message: "User not authenticated.", isError: true });
+        addProfileFeedback("User not authenticated.", true);
         return;
       }
 
@@ -42,33 +56,44 @@ function Profile() {
           },
         });
 
-        const { firstName, lastName, email } = response.data;
-        setProfile({ firstName, lastName, email });
-        setTempProfile({ firstName, lastName, email });
+        const { firstName, lastName, email, profileimg } = response.data;
+        setProfile({ firstName, lastName, email, profileimg });
+        setTempProfile({ firstName, lastName, email, profileimg });
       } catch (error) {
         console.error("Error fetching profile data:", error);
-        setFeedback({
-          message: "Failed to fetch profile data.",
-          isError: true,
-        });
+        addProfileFeedback("Failed to fetch profile data.", true);
       }
     };
 
     fetchProfileData();
   }, []);
 
-  const handleChange = (e) => {
+  const handleProfileChange = (e) => {
     const { name, value } = e.target;
-    setTempProfile((prevProfile) => ({ ...prevProfile, [name]: value }));
+    setTempProfile((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswords((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      uploadImage(file);
+    }
   };
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
+    addProfileFeedback([]);
     const userToken = localStorage.getItem("token");
     if (!userToken) {
       console.error("No user token found in local storage.");
-      setFeedback({ message: "User not authenticated.", isError: true });
-      return; }
+      addProfileFeedback("User not authenticated.", true);
+      return;
+    }
     try {
       const response = await axios.put(
         "http://127.0.0.1:3005/updateProfile",
@@ -76,38 +101,39 @@ function Profile() {
         {
           headers: {
             Authorization: `Bearer ${userToken}`,
-          }, });
-      console.log(response.data); 
+          },
+        }
+      );
+      console.log(response.data);
       if (response.status === 200) {
         setProfile(tempProfile);
-
-        setFeedback({
-          message: "Profile updated successfully!",
-          isError: false,
-        });
+        addProfileFeedback("Profile updated successfully.", false);
       } else {
-        setFeedback({ message: "Failed to update profile.", isError: true });
+        addProfileFeedback("Failed to update profile.", true);
       }
     } catch (error) {
       console.error("Error updating profile:", error);
-      setFeedback({ message: "Failed to update profile.", isError: true });
+      addProfileFeedback("Failed to update profile.", true);
     }
   };
 
-  const handlePasswordUpdate = async () => {
+  const handlePasswordUpdate = async (e) => {
+    e.preventDefault();
+    addPasswordFeedback([]);
     const userToken = localStorage.getItem("token");
     if (!userToken) {
       console.error("No user token found in local storage.");
-      setFeedback({ message: "User not authenticated.", isError: true });
+      addPasswordFeedback("User not authenticated.", true);
       return;
     }
 
     try {
+      const { currentPassword, newPassword } = passwords;
       const response = await axios.put(
         "http://127.0.0.1:3005/updatePassword",
         {
-          currentPassword: profile.currentPassword,
-          newPassword: profile.newPassword,
+          currentPassword,
+          newPassword,
         },
         {
           headers: {
@@ -115,15 +141,57 @@ function Profile() {
           },
         }
       );
-      console.log(response.data); // Assuming the server returns a success message
-      // Update feedback state
-      setFeedback({
-        message: "Password updated successfully!",
-        isError: false,
-      });
+      console.log(response.data);
+      if (response.status === 200) {
+        // Optionally reset password fields here if desired
+        setPasswords({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+        addPasswordFeedback("Password updated successfully.", false);
+      } else {
+        addPasswordFeedback("Failed to update password.", true);
+      }
     } catch (error) {
       console.error("Error updating password:", error);
-      setFeedback({ message: "Failed to update password.", isError: true });
+      addPasswordFeedback("Failed to update password.", true);
+    }
+  };
+
+  const uploadImage = async (file) => {
+    const formData = new FormData();
+    formData.append("profileImage", file);
+    const userToken = localStorage.getItem("token");
+    if (!userToken) {
+      console.error("No user token found in local storage.");
+      addProfileFeedback("User not authenticated.", true);
+      return;
+    }
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:3005/uploadImage",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          },
+        }
+      );
+      // Assuming the response includes the new image path
+      if (response.data.newImagePath) {
+        setProfile((prevProfile) => ({
+          ...prevProfile,
+          profileimg: response.data.newImagePath,
+        }));
+        addProfileFeedback("Image updated successfully.", false);
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      addProfileFeedback("Failed to upload image.", true);
     }
   };
 
@@ -134,7 +202,25 @@ function Profile() {
       <div className="profile-container">
         <div className="profile-card">
           <div className="profile-pic-section">
-            <div className="profile-pic"></div>
+            <img
+              src={profile.profileimg || "/user.png"}
+              alt="Profile-Pic"
+              className="profile-pic"
+            />
+            <input
+              type="file"
+              id="profilePicUpload"
+              style={{ display: "none" }}
+              onChange={handleImageChange}
+              accept="image/png, image/jpeg"
+            />
+            <label htmlFor="profilePicUpload" className="profile-overlay">
+              <div className="camera-icon">
+                <img src="camera-icon.png" alt="cam-icon" width="70px" />
+              </div>
+            </label>
+          </div>
+          <div className="profile-details-section">
             <div className="username">{`${profile.firstName} ${profile.lastName}`}</div>
             <div className="email">{`${profile.email}`}</div>
           </div>
@@ -150,7 +236,7 @@ function Profile() {
                 name="firstName"
                 type="text"
                 value={tempProfile.firstName}
-                onChange={handleChange}
+                onChange={handleProfileChange}
               />
             </div>
             <div className="form-section">
@@ -160,7 +246,7 @@ function Profile() {
                 name="lastName"
                 type="text"
                 value={tempProfile.lastName}
-                onChange={handleChange}
+                onChange={handleProfileChange}
               />
             </div>
             <div className="form-section">
@@ -170,7 +256,7 @@ function Profile() {
                 name="email"
                 type="email"
                 value={tempProfile.email}
-                onChange={handleChange}
+                onChange={handleProfileChange}
               />
             </div>
             <div className="button-container">
@@ -178,15 +264,16 @@ function Profile() {
                 Save Changes
               </button>
             </div>
-            {feedback.message && (
+            {profileFeedback.map((fb, index) => (
               <div
+                key={index}
                 className={`feedback-message ${
-                  feedback.isError ? "error" : "success"
+                  fb.isError ? "error" : "success"
                 }`}
               >
-                {feedback.message}
+                {fb.message}
               </div>
-            )}
+            ))}
           </form>
           <form onSubmit={handlePasswordUpdate} className="change-password">
             <p className="update-label">Change Password</p>
@@ -199,7 +286,7 @@ function Profile() {
                 type="password"
                 autoComplete="off"
                 value={tempProfile.currentPassword}
-                onChange={handleChange}
+                onChange={handlePasswordChange}
               />
             </div>
             <div className="form-section">
@@ -210,7 +297,7 @@ function Profile() {
                 type="password"
                 autoComplete="off"
                 value={tempProfile.newPassword}
-                onChange={handleChange}
+                onChange={handlePasswordChange}
               />
             </div>
             <div className="form-section">
@@ -221,7 +308,7 @@ function Profile() {
                 type="password"
                 autoComplete="off"
                 value={tempProfile.confirmPassword}
-                onChange={handleChange}
+                onChange={handlePasswordChange}
               />
             </div>
             <div className="button-container">
@@ -229,15 +316,16 @@ function Profile() {
                 Save Changes
               </button>
             </div>
-            {feedback.message && (
+            {passwordFeedback.map((fb, index) => (
               <div
+                key={index}
                 className={`feedback-message ${
-                  feedback.isError ? "error" : "success"
+                  fb.isError ? "error" : "success"
                 }`}
               >
-                {feedback.message}
+                {fb.message}
               </div>
-            )}
+            ))}
           </form>
         </div>
       </div>
