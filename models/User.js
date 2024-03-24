@@ -21,7 +21,7 @@ const userSchema = new Schema({
   },
   usertype:{
     type: String,
-    required: true,
+    // required: true,
   }
 });
 

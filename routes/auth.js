@@ -1,13 +1,14 @@
 require("dotenv").config();
 const express = require("express");
+const app = express();
+app.use(express.static("public"));
 const bcrypt = require("bcrypt");
-const multer = require('multer');
-
+const multer = require("multer");
 
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-const connectDb=require("../Db/Db.js")
+const connectDb = require("../Db/Db.js");
 
 const Waste = require("../models/Waste.js");
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -37,9 +38,9 @@ const verifyToken = (req, res, next) => {
 
 // Register User
 router.post("/register", async (req, res) => {
-  const { fname, lname, email, password,usertype } = req.body;
+  const { fname, lname, email, password, usertype,agreedToPrivacy } = req.body;
 
-  if (!fname || !lname || !email || !password || !usertype) {
+  if (!fname || !lname || !email || !password || !usertype||!agreedToPrivacy) {
     return res.status(400).json({ error: "Please fill all required fields" });
   }
 
@@ -58,7 +59,7 @@ router.post("/register", async (req, res) => {
       lname,
       email,
       password: hashedPassword,
-      usertype
+      usertype,
     });
 
     await user.save();
@@ -87,12 +88,15 @@ router.post("/login", async (req, res) => {
     if (!user) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
     const tokenPayload = {
       userId: user._id,
       usertype: user.usertype,
       firstName: user.fname, // Add the first name to the token payload
     };
-
 
     const token = jwt.sign(tokenPayload, JWT_SECRET, {
       expiresIn: "12h",
@@ -105,31 +109,30 @@ router.post("/login", async (req, res) => {
   }
 });
 
-
-const path = require('path');
-
+const path = require("path");
 
 // Multer configuration for file upload
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // cb(null, './uploads'); 
-    cb(null, 'uploads')// Save uploaded files to the 'uploads' folder
+    // cb(null, './uploads');
+    cb(null, "uploads"); // Save uploaded files to the 'uploads' folder
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + path.extname(file.originalname)); // Rename uploaded files with a unique name
-  }
+  },
 });
 
 const upload = multer({ storage: storage });
 
-router.post("/submit", upload.single('image'), async (req, res) => {
-  const { name, contactno, address, pincode, email, pickupdate, typeofwaste } = req.body;
-  const imagePath = req.file ? req.file.path : ''; // Check if req.file exists
-
+router.post("/submit", upload.single("image"), async (req, res) => {
+  const { name, contactno, address, pincode, email, pickupdate, typeofwaste } =
+    req.body;
+  const imagePath = req.file ? req.file.path : ""; // Check if req.file exists
 
   try {
     await connectDb();
     const waste = new Waste({
+      user: req.user.userId,
       name,
       contactno,
       address,
@@ -137,7 +140,7 @@ router.post("/submit", upload.single('image'), async (req, res) => {
       email,
       pickupdate,
       typeofwaste,
-     imagePath
+      imagePath, // ObjectId of the user
     });
 
     await waste.save();
@@ -149,9 +152,9 @@ router.post("/submit", upload.single('image'), async (req, res) => {
   }
 });
 
- const uploadsPath = path.join(__dirname, '..', 'uploads'); // Assuming the uploads folder is located at the root level of your project
+const uploadsPath = path.join(__dirname, "..", "uploads"); // Assuming the uploads folder is located at the root level of your project
 
- router.use('/uploads', express.static(uploadsPath));
+router.use("/uploads", express.static(uploadsPath));
 // router.use('/uploads',express.static('uploads'))
 router.get("/user", async (req, res) => {
   try {
@@ -163,13 +166,13 @@ router.get("/user", async (req, res) => {
       // Handle case where no data is found
       return res.status(404).json({ message: "No user data found" });
     }
-  
-    const usersWithImageUrl = userdata.map(user => {
+
+    const usersWithImageUrl = userdata.map((user) => {
       return {
         ...user._doc,
-         imagePath: `/uploads/${user.imagePath}`
-        
-         // Modify imagePath to contain the URL
+        imagePath: `/uploads/${user.imagePath}`,
+
+        // Modify imagePath to contain the URL
       };
     });
 
@@ -179,8 +182,6 @@ router.get("/user", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
-
 
 //forget password
 // router.post("/forgotpass", async (req, res) => {
@@ -287,31 +288,24 @@ router.put("/updatePassword", verifyToken, async (req, res) => {
   }
 });
 
-// Assume you have an endpoint like this in your backend
-
-
 router.get("/searchwaste", async (req, res) => {
-  const { searchInput } = req.query;
+  const { types } = req.query; // "types" will be a comma-separated string of selected waste types
   try {
     await connectDb();
-    let filteredData = [];
+    let query = {};
 
-    if (searchInput) {
-      filteredData = await Waste.find({
-        typeofwaste: { $regex: new RegExp(searchInput, "i") },
-      });
-    } else {
-      filteredData = await Waste.find();
+    if (types) {
+      const typesArray = types.split(","); // Convert the string into an array of types
+      query.typeofwaste = { $in: typesArray };
     }
 
+    const filteredData = await Waste.find(query);
+
     // Format imagePath to contain the URL
-    const filteredDataWithImageUrl = filteredData.map((user) => {
-      return {
-        ...user._doc,
-        imagePath: `/uploads/${user.imagePath}`
-        
-      };
-    });
+    const filteredDataWithImageUrl = filteredData.map((user) => ({
+      ...user._doc,
+      imagePath: `/uploads/${user.imagePath}`,
+    }));
 
     res.json(filteredDataWithImageUrl);
   } catch (error) {
@@ -320,9 +314,41 @@ router.get("/searchwaste", async (req, res) => {
   }
 });
 
+router.post("/forgotpass", async (req, res) => {
+  const { email, currentPassword, newPassword, confirmPassword } = req.body;
 
+  try {
+    await connectDb();
+    // Check if the user exists with the provided email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: "Email id not exist" });
+    }
 
+    // Verify the current password
+    // const isPasswordMatch = await bcrypt.compare(currentPassword, user.password);
+    // if (!isPasswordMatch) {
+    //   return res.status(400).json({ error: "Current password is incorrect" });
+    // }
 
+    // Validate the new password and confirm password
+    if (newPassword !== confirmPassword) {
+      return res.status(422).json({ error: "Passwords do not match" });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update user password with the hashed new password
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error updating password:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 
 module.exports = router;
