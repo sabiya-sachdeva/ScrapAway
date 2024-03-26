@@ -2,10 +2,10 @@ const mongoose=require('mongoose')
 
 const wasteSchema=new mongoose.Schema
 ({
-    name:{
-        type:String,
-        required:true
-    },
+    // name:{
+    //     type:String,
+    //     required:true
+    // },
     contactno:{
         type:Number,
        
@@ -20,11 +20,11 @@ const wasteSchema=new mongoose.Schema
         required:true
        
     },
-    email:{
-        type:String,
-        required:true
+    // email:{
+    //     type:String,
+    //     required:true
       
-    },
+    // },
   pickupdate:{
         type:String,
         required:true

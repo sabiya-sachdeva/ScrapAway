@@ -2,6 +2,10 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 app.use(express.static("public"));
+
+// app.use('/api', require('./uploads'));
+
+
 const bcrypt = require("bcrypt");
 const multer = require("multer");
 
@@ -125,22 +129,25 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post("/submit", upload.single("image"), async (req, res) => {
-  const { name, contactno, address, pincode, email, pickupdate, typeofwaste } =
+  // const { name, contactno, address, pincode, email, pickupdate, typeofwaste } =
+  //   req.body;
+
+    const { typeofwaste,address, pincode,contactno, pickupdate} =
     req.body;
   const imagePath = req.file ? req.file.path : ""; // Check if req.file exists
 
   try {
     await connectDb();
     const waste = new Waste({
-      user: req.user.userId,
-      name,
-      contactno,
+      // user: req.user.userId,
+      typeofwaste,
+      imagePath,
       address,
       pincode,
-      email,
+      contactno,
       pickupdate,
-      typeofwaste,
-      imagePath, // ObjectId of the user
+    
+      // ObjectId of the user
     });
 
     await waste.save();
@@ -349,6 +356,30 @@ router.post("/forgotpass", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+
+
+
+
+// router.post('/uploadImage', upload.single('profileImage'), async (req, res) => {
+//   try {
+//     // Assuming the user is authenticated and user data is available in req.user
+//     const { userId } = req.user; // Assuming you have stored user ID in req.user after authentication
+
+//     if (!req.file) {
+//       return res.status(400).json({ message: 'No image uploaded' });
+//     }
+
+//     // Update user's profile image path in the database
+//     const imagePath = req.file.filename;
+//     await User.findByIdAndUpdate(userId, { profileimg: imagePath });
+
+//     res.json({ imagePath: `/uploads/${imagePath}` });
+//   } catch (error) {
+//     console.error('Error uploading image:', error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// });
 
 
 module.exports = router;
