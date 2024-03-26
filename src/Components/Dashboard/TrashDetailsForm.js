@@ -47,11 +47,11 @@ const TrashDetailsForm = () => {
   const postdata = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("name", user.name);
+    // formData.append("name", user.name);
     formData.append("contactno", user.contactno);
     formData.append("address", user.address);
     formData.append("pincode", user.pincode);
-    formData.append("email", user.email);
+    // formData.append("email", user.email);
     formData.append("pickupdate", user.pickupdate);
     formData.append("typeofwaste", user.typeofwaste.join(","));
     formData.append("image", image);
@@ -98,30 +98,26 @@ const TrashDetailsForm = () => {
                 <h2 className="fs-title">
                   Enter a few details to get a clutter free space!
                 </h2>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Full Name"
-                  value={user.name}
-                  onChange={handleinput}
-                />
+                <p className="fs-subtitle">Type of waste</p>
+                <select
+                  name="waste"
+                  multiple
+                  style={{ width: "20%" }}
+                  onChange={handleWasteTypeChange}
+                >
+                  <option value="Plastic">Plastic</option>
+                  <option value="Paper">Paper</option>
+                  <option value="Glass">Glass</option>
+                  <option value="Metal">Metal</option>
+                  <option value="Organic">Organic</option>
+                  <option value="Steel">Steel</option>
+                  <option value="Iron">Iron</option>
+                </select>
+
                 <br />
-                <input
-                  type="text"
-                  name="contactno"
-                  placeholder="Contact number"
-                  value={user.contactno}
-                  onChange={handleinput}
-                />
+
                 <br />
-                <input
-                  type="text"
-                  name="email"
-                  placeholder="Email"
-                  onChange={handleinput}
-                  value={user.email}
-                />
-                <br />
+                
                 <input
                   type="button"
                   name="next"
@@ -134,28 +130,15 @@ const TrashDetailsForm = () => {
                 <h2 className="fs-title">
                   Enter a few details to get a clutter free space!
                 </h2>
-                <input
-                  type="text"
-                  name="address"
-                  placeholder="Address"
-                  value={user.address}
-                  onChange={handleinput}
-                  style={{ marginRight: "10px", width: "45%" }}
-                />
-                <input
-                  type="text"
-                  name="pincode"
-                  placeholder="PinCode"
-                  onChange={handleinput}
-                  value={user.pincode}
-                  style={{ width: "20%" }}
-                />
+<br/>
+<br/>
                 <input
                   type="file"
                   name="image"
                   placeholder="Upload Image"
                   onChange={handleImageUpload}
                 />
+
                 <br />
                 <input
                   type="button"
@@ -176,12 +159,33 @@ const TrashDetailsForm = () => {
                 <h2 className="fs-title">
                   Enter a few details to get a clutter free space!
                 </h2>
-                <p className="fs-subtitle">Pick Up date</p>
-                <br />
-                <DatePickerComponent
-                  handleDateChange={handleDateChange}
-                  selectedDate={selectedDate}
+                <input
+                  type="text"
+                  name="address"
+                  placeholder="Address"
+                  value={user.address}
+                  onChange={handleinput}
+                  style={{ marginRight: "10px", width: "50%" }}
                 />
+                <br />
+
+                <input
+                  type="text"
+                  name="pincode"
+                  placeholder="PinCode"
+                  onChange={handleinput}
+                  value={user.pincode}
+                  style={{ width: "50%" }}
+                />
+                <br />
+                <input
+                  type="text"
+                  name="contactno"
+                  placeholder="Contact number"
+                  value={user.contactno}
+                  onChange={handleinput}
+                />
+
                 <br />
                 <input
                   type="button"
@@ -202,21 +206,15 @@ const TrashDetailsForm = () => {
                 <h2 className="fs-title">
                   Enter a few details to get a clutter free space!
                 </h2>
-                <p className="fs-subtitle">Type of waste</p>
-                <select
-                  name="waste"
-                  multiple
-                  style={{ width: "20%" }}
-                  onChange={handleWasteTypeChange}
-                >
-                  <option value="Plastic">Plastic</option>
-                  <option value="Paper">Paper</option>
-                  <option value="Glass">Glass</option>
-                  <option value="Metal">Metal</option>
-                  <option value="Organic">Organic</option>
-                  <option value="Steel">Steel</option>
-                  <option value="Iron">Iron</option>
-                </select>
+
+                <p className="fs-subtitle">Pick Up date</p>
+                <br />
+                <DatePickerComponent
+                  handleDateChange={handleDateChange}
+                  selectedDate={selectedDate}
+                 
+                />
+
                 <br />
                 <input
                   type="button"
@@ -240,7 +238,7 @@ const TrashDetailsForm = () => {
           <img src="confirmation.gif" alt="Logo" height="300px" />
           <br />
           <h2>Thank You </h2>
-          <h5>For taking a step towards a cleaner environment!</h5>
+          <h5 className="trashdetailsh5">For taking a step towards a cleaner environment!</h5>
           <p>We'll be in touch with pickup details soon.</p>
         </div>
       )}

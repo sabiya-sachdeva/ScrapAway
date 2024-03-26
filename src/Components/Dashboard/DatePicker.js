@@ -8,7 +8,8 @@ const DatePickerComponent = ({ handleDateChange, selectedDate }) => {
       selected={selectedDate}
       onChange={handleDateChange}
       placeholderText="Pick Up date"
-      style={{width:'90%'}}
+      style={{width:"100%"}}
+    
     />
   );
 };
